@@ -10,7 +10,7 @@ public class GreenAgent {
      * @param uncertaintyLowerBound The lower bound of the agent's uncertainty value
      * @param uncertaintyUpperBound The upper bound of the agent's uncertainty value
      */
-    public GreenAgent(double uncertaintyLowerBound, double uncertaintyUpperBound) {
+    public GreenAgent(double uncertaintyLowerBound, double uncertaintyUpperBound, boolean inputOpinion) {
         //For random generation a double is not discrete so we will make it an integer
         int uncertaintyLowerBoundInteger = (int)(uncertaintyLowerBound * 1000);
         int uncertaintyUpperBoundInteger = (int)(uncertaintyUpperBound * 1000);
@@ -21,7 +21,7 @@ public class GreenAgent {
         //Map random number so its in between the interval
         uncertainty = uncertainty / 1000.0 + (uncertaintyLowerBound);
 
-        opinionOnVoting = false;
+        opinionOnVoting = inputOpinion;
     }
 
     /**
