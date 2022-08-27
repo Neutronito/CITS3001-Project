@@ -10,7 +10,10 @@ public class Game {
 
     private double[][] greenNetwork;
     private GreenAgent[] greenAgentsList;
-    private int greenAgentCount = 0;
+    private int greenAgentCount;
+
+    private GreyAgent[] greyAgentsList;
+    private int greyAgentCount;
 
     /**
      * Creates an instance of the game using the input parameters
@@ -24,6 +27,7 @@ public class Game {
     public Game(int greenAgentCount, double probabilityOfConnection, int greyCount, double greyEvilProportion, double[] greenUncertaintyInterval, double greenVotePercent) {
         //Fill variables
         this.greenAgentCount = greenAgentCount;
+        greyAgentCount = greyCount;
 
         //Use the jgraph library to create a graph generator that uses Erdos Renyi Model
         GnpRandomGraphGenerator<Integer,DefaultWeightedEdge> greenNetworkGenerator = new GnpRandomGraphGenerator<>(greenAgentCount, probabilityOfConnection);
@@ -80,10 +84,10 @@ public class Game {
         int proportion = (int)greenVotePercent * greenAgentCount;
         Random votingGenerator = new Random();
 
-        while ((greenAgentCount - total) > proportion) {
+        while ((greenAgentCount - total) < proportion) {
             
             //Randomly choose a green and make it want to vote
-            int generatedIndex = votingGenerator.nextInt(greenAgentCount);
+            int generatedIndex = votingGenerator.nextInt(total);
             int greenID = greenAgentsRandom.get(generatedIndex);
             greenAgentsList[greenID].setVotingOpinion(true);
 
@@ -92,6 +96,33 @@ public class Game {
             total--;
         }
 
+        //Create all the grey agents
+        greyAgentsList = new GreyAgent[greyAgentCount];
+        for (int i = 0; i < greyAgentCount; i++) {
+            greyAgentsList[i] = new GreyAgent(true);
+        }
+
+        //Now make sure the right proportion are voting, use random generation for this
+        ArrayList<Integer> greyAgentsRandom = new ArrayList<>();
+
+        for (int i = 0; i < greyAgentCount; i++) {
+            greyAgentsRandom.add(i);
+        }
+
+        total = greyAgentCount;
+        proportion = (int)greyEvilProportion * greyAgentCount;
+
+        while ((greyAgentCount - total) < proportion) {
+            
+            //Randomly choose a green and make it want to vote
+            int generatedIndex = votingGenerator.nextInt(total);
+            int greyID = greyAgentsRandom.get(generatedIndex);
+            greyAgentsList[greyID].setBlueTeamStatus(false);
+
+            //Now remove it so we don't consider it again
+            greyAgentsRandom.remove(Integer.valueOf(generatedIndex));
+            total--;
+        }
     }
 
     /**
