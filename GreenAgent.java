@@ -1,6 +1,6 @@
 import java.util.Random;
 
-public class Green {
+public class GreenAgent {
 
     private boolean opinionOnVoting; //true represents going to vote, false represents not going to vote
     private double uncertainty;
@@ -10,7 +10,7 @@ public class Green {
      * @param uncertaintyLowerBound The lower bound of the agent's uncertainty value
      * @param uncertaintyUpperBound The upper bound of the agent's uncertainty value
      */
-    public Green(double uncertaintyLowerBound, double uncertaintyUpperBound) {
+    public GreenAgent(double uncertaintyLowerBound, double uncertaintyUpperBound) {
         //For random generation a double is not discrete so we will make it an integer
         int uncertaintyLowerBoundInteger = (int)(uncertaintyLowerBound * 1000);
         int uncertaintyUpperBoundInteger = (int)(uncertaintyUpperBound * 1000);
