@@ -1,4 +1,3 @@
-import org.jgrapht.alg.matching.GreedyMaximumCardinalityMatching;
 import org.jgrapht.generate.*;
 import java.util.function.Supplier;
 import org.jgrapht.graph.DefaultWeightedEdge;
