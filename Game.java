@@ -1,4 +1,5 @@
 import org.jgrapht.generate.*;
+import java.util.function.Supplier;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
@@ -17,22 +18,29 @@ public class Game {
     public Game(int greenNodeCount, double probabilityOfConnection, int greyCount, double greyEvilProportion, double greenVotePercent) {
 
         //Use the jgraph library to create a graph generator that uses Erdos Renyi Model
-        GnpRandomGraphGenerator<Integer,DefaultWeightedEdge> greenNetworkGraph = new GnpRandomGraphGenerator<>(greenNodeCount, probabilityOfConnection);
-
-        CompleteGraphGenerator<Integer, DefaultWeightedEdge> completeGenerator = new CompleteGraphGenerator<>(greenNodeCount);
+        GnpRandomGraphGenerator<Integer,DefaultWeightedEdge> greenNetworkGenerator = new GnpRandomGraphGenerator<>(greenNodeCount, probabilityOfConnection);
         
-        //Init the graph
+        //Init the graph 
         greenNetwork = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
         
+        //Create the vertex supplier
+        Supplier<Integer> greenSupplier = new Supplier<Integer>() {
+            private int id = 0;
+            
+            public Integer get() {
+                return id++;
+            }
+        };
+
+        greenNetwork.setVertexSupplier(greenSupplier);
 
         //Use the generator to make the graph
-        //greenNetworkGraph.generateGraph(greenNetwork);
-        completeGenerator.generateGraph(greenNetwork);
+        greenNetworkGenerator.generateGraph(greenNetwork);
 
         //Debugging lemme have a look through this graph
         for (int i = 0; i < greenNodeCount; i++) {
             for (int j = 0; j < greenNodeCount; j++) {
-                System.out.println("We are currently looking at path (" + i + ", " + j + ") and the weight is " + greenNetwork.getEdgeWeight(greenNetwork.getEdge(i, j)));
+                //System.out.println("We are currently looking at path (" + i + ", " + j + ") and the weight is " + greenNetwork.getEdgeWeight(greenNetwork.getEdge(i, j)));
             }
         }
     }
