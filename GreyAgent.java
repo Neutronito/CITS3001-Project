@@ -9,4 +9,20 @@ public class GreyAgent {
     public GreyAgent (boolean inputOnBlueTeam) {
         onBlueTeam = inputOnBlueTeam;
     }
+
+    /**
+     * Getter for the grey agent blue team status
+     * @return true if on the blue team, false if on the red team
+     */
+    public boolean getBlueTeamStatus() {
+        return onBlueTeam;
+    }
+    
+    /**
+     * Setter for the grey agent blue team status
+     * @param inputBlueTeamStatus true if on the blue team, false if on the red team
+     */
+    public void setBlueTeamStatus(boolean inputBlueTeamStatus) {
+        onBlueTeam = inputBlueTeamStatus;
+    }
 }
