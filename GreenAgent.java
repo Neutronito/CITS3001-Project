@@ -3,7 +3,7 @@ import java.util.Random;
 public class GreenAgent {
 
     private boolean opinionOnVoting; //true represents going to vote, false represents not going to vote
-    private double uncertainty;
+    private double uncertainty; //This value must lie beween -1 and 1, the more positive the more uncertain
 
     /**
      * Create an instance of a green agent
@@ -36,7 +36,7 @@ public class GreenAgent {
      * Getter for the uncertainty of the green agent
      * @return The uncertainty value
      */
-    public double uncertainty() {
+    public double getUncertainty() {
         return uncertainty;
     }
 
