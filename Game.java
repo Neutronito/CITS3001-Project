@@ -172,26 +172,40 @@ public class Game {
                 double firstUncertainty = firstAgent.getUncertainty();
                 double secondUncertainty = secondAgent.getUncertainty();
 
+                double firstOutput;
+                double secondOutput;
+
                 //They have different opinion
                 if (firstOpinion != secondOpinion) {
+                    
                     //This is for first agent
 
-                    //This considers how certain the other agent is in their opinion
-                    double theirCertainty = (2 - (secondUncertainty + 1)) / 2; //Goes from 0 - 1, higher is more certain
-                    
-                    //This considers the difference in certainty between the two agents
-                    double certaintyDifference = ((2 - (secondUncertainty + 1)) - (2 -  (firstUncertainty + 1))) / 4;
-                    
-                    double newUncertaintyFactor = theirCertainty + certaintyDifference; //Also 0 - 1
-                    //Force it to be between 0 and 1
-                    if (newUncertaintyFactor < 0) newUncertaintyFactor = 0;
-                    if (newUncertaintyFactor > 1) newUncertaintyFactor = 1;
+                    double error = (firstUncertainty + 1) - (secondUncertainty + 1);
+                  
+                    if (error >= 0) {
+                        firstOutput = (1 - firstUncertainty) * (error / 2);
+                    } else {
+                        error *= -1;
+                        firstOutput = (1 - firstUncertainty) * (error / 2) / 100;
+                    }
 
+                    //This is for the second agent
 
-
+                    error = (secondUncertainty + 1) - (firstUncertainty + 1);
+                  
+                    if (error >= 0) {
+                        secondOutput = (1 - secondUncertainty) * (error / 2);
+                    } else {
+                        error *= -1;
+                        secondOutput = (1 - secondUncertainty) * (error / 2) / 100;
+                    }
 
                 }
-                
+
+                //Update uncertainties at the end. This is done to keep the code simple.
+                //However, we can liken this to the agents going home and thinking about the conversation, and then changing their mindset so it is realistic.
+                firstAgent.setUncertainty(firstOutput);
+                secondAgent.setUncertainty(secondOutput);
             }
         }
     }
