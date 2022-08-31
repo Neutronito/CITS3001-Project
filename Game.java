@@ -151,6 +151,52 @@ public class Game {
     }
 
     /**
+     * This executes the green turn, which consists of all green nodes interaction with one another and modifying their opinion and or uncertainty
+     */
+     public void executeGreenTurn() {
+        //Interactions are bi-directional, so each pair only needs considering once
+        int loopCondition = greenAgentCount - 1;
+        for (int i = 0; i < loopCondition; i++) {
+            for (int j = i + 1; j < greenAgentCount; j++) {
+                //Check the pair interacts
+                if (greenNetwork[i][j] == 0) {
+                    continue;
+                }
+
+                GreenAgent firstAgent = greenAgentsList[i];
+                GreenAgent secondAgent = greenAgentsList[j];
+
+                boolean firstOpinion = firstAgent.getVotingOpinion();
+                boolean secondOpinion = secondAgent.getVotingOpinion();
+
+                double firstUncertainty = firstAgent.getUncertainty();
+                double secondUncertainty = secondAgent.getUncertainty();
+
+                //They have different opinion
+                if (firstOpinion != secondOpinion) {
+                    //This is for first agent
+
+                    //This considers how certain the other agent is in their opinion
+                    double theirCertainty = (2 - (secondUncertainty + 1)) / 2; //Goes from 0 - 1, higher is more certain
+                    
+                    //This considers the difference in certainty between the two agents
+                    double certaintyDifference = ((2 - (secondUncertainty + 1)) - (2 -  (firstUncertainty + 1))) / 4;
+                    
+                    double newUncertaintyFactor = theirCertainty + certaintyDifference; //Also 0 - 1
+                    //Force it to be between 0 and 1
+                    if (newUncertaintyFactor < 0) newUncertaintyFactor = 0;
+                    if (newUncertaintyFactor > 1) newUncertaintyFactor = 1;
+
+
+
+
+                }
+                
+            }
+        }
+    }
+
+    /**
      * Print out the green network as an adjacency matrix with all the edge weights
      */
     public void printGreenNetwork() {
