@@ -197,14 +197,5 @@ public class Game {
             }
         }
     }
-
-    public static void main(String[] args) {
-        double[] uncertaintyInterval = {-1.0, 0.4};
-        Game curGame = new Game(10, 0.4, 10, 40.0, uncertaintyInterval, 10.0);
-        curGame.printGreenNetwork();
-        curGame.printGreenAgents();
-        curGame.printGreyAgents();
-    }
-
 }
 
