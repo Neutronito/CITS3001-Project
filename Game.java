@@ -81,7 +81,7 @@ public class Game {
         }
 
         int total = greenAgentCount;
-        int proportion = (int)greenVotePercent * greenAgentCount;
+        int proportion = (int)(greenVotePercent * greenAgentCount / 100);
         Random votingGenerator = new Random();
 
         while ((greenAgentCount - total) < proportion) {
@@ -110,7 +110,7 @@ public class Game {
         }
 
         total = greyAgentCount;
-        proportion = (int)greyEvilProportion * greyAgentCount;
+        proportion = (int)(greyEvilProportion * greyAgentCount / 100);
 
         while ((greyAgentCount - total) < proportion) {
             
@@ -136,7 +136,6 @@ public class Game {
         }
         System.out.println();
 
-
         for (int i = 0; i < greenAgentCount; i++) {
             System.out.print(i + "\t");
             for (int j = 0; j < greenAgentCount; j++) {
@@ -146,10 +145,22 @@ public class Game {
         }
     }
 
+    /**
+     * Prints out the information of all green agents in the network
+     */
+    public void printGreenAgents() {
+        System.out.println("Agent \t Uncertainty \t Opinion");
+        for (int i = 0; i < greenAgentCount; i++) {
+            System.out.printf("%d \t %.4f \t", i, greenAgentsList[i].getUncertainty());
+            System.out.println(greenAgentsList[i].getVotingOpinion()); 
+        }
+    }
+
     public static void main(String[] args) {
-        double[] uncertaintyInterval = {-1.0, 1.0};
-        Game curGame = new Game(10, 0.4, 0, 0.0, uncertaintyInterval, 10.0);
+        double[] uncertaintyInterval = {-1.0, 0.4};
+        Game curGame = new Game(10, 0.4, 10, 0.4, uncertaintyInterval, 10.0);
         curGame.printGreenNetwork();
+        curGame.printGreenAgents();
     }
 
 }
