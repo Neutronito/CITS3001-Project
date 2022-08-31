@@ -149,10 +149,27 @@ public class Game {
      * Prints out the information of all green agents in the network
      */
     public void printGreenAgents() {
-        System.out.println("Agent \t Uncertainty \t Opinion");
+        System.out.println("Agent" + "\t" + "Uncertainty" + "\t" + "Opinion");
+        
         for (int i = 0; i < greenAgentCount; i++) {
             System.out.printf("%d \t %.4f \t", i, greenAgentsList[i].getUncertainty());
             System.out.println(greenAgentsList[i].getVotingOpinion()); 
+        }
+    }
+
+    /**
+     * Prints out the information of all the grey agents in the game
+     */
+    public void printGreyAgents() {
+        System.out.println("Agent" + "\t" + "Team");
+        for (int i = 0; i < greyAgentCount; i++) {
+            System.out.print(i + "\t");
+            
+            if (greyAgentsList[i].getBlueTeamStatus()) {
+                System.out.println("Blue");
+            } else {
+                System.out.println("Red");
+            }
         }
     }
 
@@ -161,6 +178,7 @@ public class Game {
         Game curGame = new Game(10, 0.4, 10, 0.4, uncertaintyInterval, 10.0);
         curGame.printGreenNetwork();
         curGame.printGreenAgents();
+        curGame.printGreyAgents();
     }
 
 }
