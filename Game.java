@@ -29,6 +29,31 @@ public class Game {
         this.greenAgentCount = greenAgentCount;
         greyAgentCount = greyCount;
 
+        //Some error handling
+        if (greenAgentCount < 1) {
+            throw new IllegalArgumentException("Error, number of green agents must be greater than 0.");
+        }
+
+        if (probabilityOfConnection < 0 || probabilityOfConnection > 1) {
+            throw new IllegalArgumentException("Error, probability of connection must be between 0 and 1 inclusively.");
+        }
+
+        if (greenVotePercent < 0 || greenVotePercent > 100) {
+            throw new IllegalArgumentException("Error, percentage of green agents that wish to vote must be between 0 and 100 inlcusively.");
+        }
+
+        if (greenUncertaintyInterval[0] > greenUncertaintyInterval[1] || greenUncertaintyInterval[0] < -1 || greenUncertaintyInterval[1] > 1) {
+            throw new IllegalArgumentException("Error, the first index of the uncertainty interval must be the lowerbound and the second must be the upperbound. The ucnertainty interval also has to be between -1 and 1 inclusively.");
+        }
+
+        if (greyCount < 0) {
+            throw new IllegalArgumentException("Error, the number of grey agents must be greater than 0.");
+        }
+
+        if (greyEvilProportion < 0 || greyEvilProportion > 100) {
+            throw new IllegalArgumentException("Error, the percentage of grey agents that are on the red team must be between 0 and 100 inclusively.");
+        }
+
         //Use the jgraph library to create a graph generator that uses Erdos Renyi Model
         GnpRandomGraphGenerator<Integer,DefaultWeightedEdge> greenNetworkGenerator = new GnpRandomGraphGenerator<>(greenAgentCount, probabilityOfConnection);
         
@@ -175,7 +200,7 @@ public class Game {
 
     public static void main(String[] args) {
         double[] uncertaintyInterval = {-1.0, 0.4};
-        Game curGame = new Game(10, 0.4, 10, 0.4, uncertaintyInterval, 10.0);
+        Game curGame = new Game(10, 0.4, 10, 40.0, uncertaintyInterval, 10.0);
         curGame.printGreenNetwork();
         curGame.printGreenAgents();
         curGame.printGreyAgents();
