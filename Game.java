@@ -15,6 +15,9 @@ public class Game {
     private GreyAgent[] greyAgentsList;
     private int greyAgentCount;
 
+    final double OPINIONTHRESHOLD = 0.6; //Above this uncertainty inclusively, an agents opinion can change
+    final int OPINIONSCALEFACTOR = 1000; //Used in calculations, the higher the value the greater accuracy
+    final double OPINIONSETAFTERCHANGE = 0.6; //If an agents opinion changes, this is what their uncerainty becomes 
     /**
      * Creates an instance of the game using the input parameters
      * @param greenAgentCount The number of green nodes to exist in the nework
@@ -153,7 +156,7 @@ public class Game {
     /**
      * This executes the green turn, which consists of all green nodes interaction with one another and modifying their opinion and or uncertainty
      */
-     public void executeGreenTurn() {
+    public void executeGreenTurn() {
         //Interactions are bi-directional, so each pair only needs considering once
         int loopCondition = greenAgentCount - 1;
         for (int i = 0; i < loopCondition; i++) {
@@ -172,8 +175,8 @@ public class Game {
                 double firstUncertainty = firstAgent.getUncertainty();
                 double secondUncertainty = secondAgent.getUncertainty();
 
-                double firstOutput;
-                double secondOutput;
+                double firstOutput = firstUncertainty;
+                double secondOutput = secondUncertainty;
 
                 //They have different opinion
                 if (firstOpinion != secondOpinion) {
@@ -183,10 +186,10 @@ public class Game {
                     double error = (firstUncertainty + 1) - (secondUncertainty + 1);
                   
                     if (error >= 0) {
-                        firstOutput = (1 - firstUncertainty) * (error / 2);
+                        firstOutput = (1 - firstUncertainty) * (error / 2) + firstUncertainty;
                     } else {
                         error *= -1;
-                        firstOutput = (1 - firstUncertainty) * (error / 2) / 100;
+                        firstOutput = (1 - firstUncertainty) * (error / 2) / 100 + firstUncertainty;
                     }
 
                     //This is for the second agent
@@ -194,18 +197,66 @@ public class Game {
                     error = (secondUncertainty + 1) - (firstUncertainty + 1);
                   
                     if (error >= 0) {
-                        secondOutput = (1 - secondUncertainty) * (error / 2);
+                        secondOutput = (1 - secondUncertainty) * (error / 2) + secondUncertainty;
                     } else {
                         error *= -1;
-                        secondOutput = (1 - secondUncertainty) * (error / 2) / 100;
+                        secondOutput = (1 - secondUncertainty) * (error / 2) / 100 + secondUncertainty;
                     }
 
+                } 
+                
+                //They have the same opinion.
+                else {
+                    //Effectively, the more certain agent will pull up the least certain agent
+                    double error = (firstUncertainty + 1) - (secondUncertainty + 1);
+
+                    //Second agent is more certain 
+                    if (error > 0) {
+                        firstOutput = (1 - firstUncertainty) * (error / 2) + firstUncertainty;
+                    }
+                    //First agent is more certain
+                    else {
+                        error *= -1;
+                        secondOutput = (1 - secondUncertainty) * (error / 2) + secondUncertainty;
+                    }
                 }
 
                 //Update uncertainties at the end. This is done to keep the code simple.
                 //However, we can liken this to the agents going home and thinking about the conversation, and then changing their mindset so it is realistic.
                 firstAgent.setUncertainty(firstOutput);
                 secondAgent.setUncertainty(secondOutput);
+
+                //Now, based upon their uncertainty, an agents opinion can change.
+                //The probability of an opinion changing is based upon how far into the threshold it is
+                Random opinionGenerator = new Random();
+                
+                //Check if agent one is above the threshold
+                if (firstAgent.getUncertainty() > OPINIONTHRESHOLD) {
+                    //Note, we assume the threshold is always positive
+                    int thresholdRange = (int)((1 - OPINIONTHRESHOLD) * OPINIONSCALEFACTOR);
+                    int randomNumber = opinionGenerator.nextInt(thresholdRange);
+                    int firstAgentMapped = (int)((firstAgent.getUncertainty() - OPINIONTHRESHOLD) * OPINIONSCALEFACTOR);
+                    
+                    //This means their opinion changes
+                    if (randomNumber <= firstAgentMapped) {
+                        firstAgent.setVotingOpinion(!firstAgent.getVotingOpinion());
+                        firstAgent.setUncertainty(OPINIONSETAFTERCHANGE);
+                    }
+                }
+
+                //Check if the second agent is above the threshold
+                if (secondAgent.getUncertainty() > OPINIONTHRESHOLD) {
+                    //Note, we assume the threshold is always positive
+                    int thresholdRange = (int)((1 - OPINIONTHRESHOLD) * OPINIONSCALEFACTOR);
+                    int randomNumber = opinionGenerator.nextInt(thresholdRange);
+                    int secondAgentMapped = (int)((secondAgent.getUncertainty() - OPINIONTHRESHOLD) * OPINIONSCALEFACTOR);
+                    
+                    //This means their opinion changes
+                    if (randomNumber <= secondAgentMapped) {
+                        secondAgent.setVotingOpinion(!secondAgent.getVotingOpinion());
+                        secondAgent.setUncertainty(OPINIONSETAFTERCHANGE);
+                    }
+                }
             }
         }
     }
