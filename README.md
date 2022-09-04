@@ -67,3 +67,58 @@ It is obvious by now that the above hypothesis was correct. To prevent this stag
 This improvement may still cause stagnation, as if all nodes are hovering 0.6 then their uncertainties will all decrease more or less the same amount. However, since a normal network has a mixture of differing opinions, we should still see the interactions causing fluctuations in the network. If this proves to not be the case, a random element can be added to cause less predictable behaviour of the graph.
 
 I will not try that yet but something else that can be done is not set every opinion to a flat value when it flips, but rather a random range. 
+
+## Trial 3
+Note that the above change was implemented, so our uncertainty decrease threshold is 0.15 and our uncertainty increase threshold is 0.05.
+We started with 9 voting yes and 6 voting no, in a fairly certain environment.
+Uncertainty interval was -1.0, 0.4.
+We executed 1000 turns. 
+
+### Trial 3 - 1
+Changed to 7 voting and 8 not voting
+Average uncertainty went from -0.2992 to 0.2094
+
+### Trial 3 - 2
+Changed to 10 voting and 5 not voting
+Average uncertainty went from -0.4085 to -0.0928
+
+### Trial 3 - 3
+Changed to 7 voting and 8 not voting
+Average uncertainty went from -0.3658 to 0.0420
+
+### Trial 3 - 4
+Changed to 8 voting and 7 not voting
+Average uncertainty went from -0.3700 to 0.2943
+
+### Trial 3 - 5
+Changed to 8 voting and 7 not voting
+Average uncertainty went from -0.3607 to 0.1203
+
+### Results
+It is slighly better, but I can still often see a lot of similar numbers, especially around 0.45 and 0.6. 0.45 = 0.6 - 0.15 which makes sense to me. As far as I can see, the passive increase is too predictable, but also, setting all agents to a flat value when flipping opinions is the real problem I think. Before changing that though, I will try the same test with a green sample size of 100. I believe the small sample size of 15 is also causing too much predictability over time.
+
+## Trial 4
+Note, as mentioned above, the sample size has now been changed to 100.
+We started with 60 voting yes and 40 voting no, in a fairly certain environment.
+Uncertainty interval was -1.0, 0.4.
+We executed 1000 turns.
+
+### Trial 4 - 1
+Changed to 45 voting and 55 not voting
+Average uncertainty went from -0.2781 to 0.5483
+
+### Trial 4 - 2
+Changed to 53 voting and 47 not voting
+Average uncertainty went from -0.3380 to 0.5425
+
+### Trial 4 - 3
+Changed to 48 voting and 52 not voting
+Average uncertainty went from -0.3094 to 0.5746
+
+### Trial 4 - 4
+Changed to 53 voting and 47 not voting
+Average uncertainty went from -0.3094 to 0.4962
+
+### Results
+As we can see, the average still approaches 0.6 While I can see a much larger distribution in the uncertainties (i.e. they are not all hovering identical values anymore) it seems that all the agent's uncertainties tend to approach a very high value time. Only ~5 agents or less held a - uncertainty by the end of 1000 turns. I am not sure why this is being caused, but for now I will get rid of the flat value on flip and make it more random, and see how this impacts the network.
+It should also be noted that the number of agents voting always drops and the number not voting always increases. I am not sure why this is the case, in a network where 60% wishes to vote, and the certainty is strong, I would expect it to either remain at 60% or increase. I believe the problem is that the uncertain nodes tend to dominate, which means that over time all the uncertain agents tend to pull down the certain agents more than the certain agents pull down the uncertain agents. This means that the population tends to become really uncertain and stay there. This is not ideal, but I will deal with it later. 
