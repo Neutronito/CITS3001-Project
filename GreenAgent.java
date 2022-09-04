@@ -53,7 +53,9 @@ public class GreenAgent {
      * @param inputUncertainty The value to set the uncerainty to
      */
     public void setUncertainty(double inputUncertainty) {
-        uncertainty = inputUncertainty;
+        if (inputUncertainty >= -1 && inputUncertainty <= 1) {
+            uncertainty = inputUncertainty;
+        }
     }
     
 }
