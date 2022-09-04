@@ -276,7 +276,7 @@ public class Game {
                         secondAgent.setVotingOpinion(!secondAgent.getVotingOpinion());
                         
                         //Pick a random value to increase by based on the given range.
-                        int range = (int)((FLIPUPPERBOUND - FLIPLOWERBOUND) / OPINIONSCALEFACTOR);
+                        int range = (int)((FLIPUPPERBOUND - FLIPLOWERBOUND) * OPINIONSCALEFACTOR);
                         double increase = opinionGenerator.nextInt(range);
                         increase /= OPINIONSCALEFACTOR;
 
