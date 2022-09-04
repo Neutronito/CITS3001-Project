@@ -26,10 +26,15 @@ public class GameRunner {
 
     public static void main(String[] args) {
         double[] uncertaintyInterval = {-1.0, 0.4};
-        GameRunner curRunner = new GameRunner(10, 0.4, 10, 40.0, uncertaintyInterval, 10.0);
+        GameRunner curRunner = new GameRunner(15, 0.4, 10, 40.0, uncertaintyInterval, 60.0);
         Game curGame = curRunner.getGameInstance();
-        curGame.printGreenNetwork();
         curGame.printGreenAgents();
-        curGame.printGreyAgents();
+        curGame.printGreenStatistics();
+        for (int i = 0; i < 10; i++) {
+            curGame.executeGreenTurn();
+        }
+        System.out.println();
+        curGame.printGreenAgents();
+        curGame.printGreenStatistics();
     }
 }
