@@ -111,17 +111,23 @@ public class Game {
         int total = greenAgentCount;
         int proportion = (int)(greenVotePercent * greenAgentCount / 100);
         Random votingGenerator = new Random();
+        System.out.println("Voting proportion is " + proportion);
 
-        while ((greenAgentCount - total) < proportion) {
-            
+        for (int i = 0; i < proportion; i++) {
             //Randomly choose a green and make it want to vote
             int generatedIndex = votingGenerator.nextInt(total);
             int greenID = greenAgentsRandom.get(generatedIndex);
             greenAgentsList[greenID].setVotingOpinion(true);
-
+            System.out.println("Set the voting ID of " + greenID);
+            
             //Now remove it so we don't consider it again
             greenAgentsRandom.remove(Integer.valueOf(generatedIndex));
             total--;
+            for (int cur : greenAgentsRandom) {
+                System.out.println(cur);
+            }
+
+            System.out.println();
         }
 
         //Create all the grey agents
@@ -292,6 +298,33 @@ public class Game {
             System.out.println(greenAgentsList[i].getVotingOpinion()); 
         }
     }
+
+    /**
+     * Prints out several metrics of the green agents, which is the total agents, the number of agents 
+     * voting yes, the number of agents voting no and the average uncertainty. 
+     */
+    public void printGreenStatistics() {
+        int greenYes = 0;
+        int greenNo = 0;
+        double uncertaintyTotal = 0;
+
+        for (int i = 0; i < greenAgentCount; i++) {
+            
+            //Increment the voting counter
+            if (greenAgentsList[i].getVotingOpinion()) {
+                greenYes++;
+            } else {
+                greenNo++;
+            }
+
+            uncertaintyTotal += greenAgentsList[i].getUncertainty();
+        }
+
+        uncertaintyTotal /= greenAgentCount;
+
+        System.out.printf("There are %d agents, %d voting and %d not voting. The average uncertainty is %.4f\n", greenAgentCount, greenYes, greenNo, uncertaintyTotal);
+    } 
+
 
     /**
      * Prints out the information of all the grey agents in the game
