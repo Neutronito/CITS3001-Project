@@ -18,6 +18,10 @@ public class Game {
     final double OPINIONTHRESHOLD = 0.6; //Above this uncertainty inclusively, an agents opinion can change
     final int OPINIONSCALEFACTOR = 1000; //Used in calculations, the higher the value the greater accuracy
     final double OPINIONSETAFTERCHANGE = 0.6; //If an agents opinion changes, this is what their uncerainty becomes 
+    
+    final double CHANGEPOSITIVETHRESHOLD = 0.05; //Threshold if uncerainty increases
+    final double CHANGENEGATIVETHRESHOLD  = 0.15; //Threshold if uncertainty decreases
+    
     /**
      * Creates an instance of the game using the input parameters
      * @param greenAgentCount The number of green nodes to exist in the nework
@@ -156,6 +160,14 @@ public class Game {
      * This executes the green turn, which consists of all green nodes interaction with one another and modifying their opinion and or uncertainty
      */
     public void executeGreenTurn() {
+
+        //Record all the starting uncertainties of nodes
+        double[] curGreenUncertainties = new double[greenAgentCount];
+
+        for (int i = 0; i < greenAgentCount; i++) {
+            curGreenUncertainties[i] = greenAgentsList[i].getUncertainty();
+        }
+
         //Interactions are bi-directional, so each pair only needs considering once
         int loopCondition = greenAgentCount - 1;
         for (int i = 0; i < loopCondition; i++) {
@@ -255,6 +267,30 @@ public class Game {
                         secondAgent.setVotingOpinion(!secondAgent.getVotingOpinion());
                         secondAgent.setUncertainty(OPINIONSETAFTERCHANGE);
                     }
+                }
+            }
+        }
+
+        //Now consider the change of each agents uncertainty
+        //If an agents uncertainty didnt change much, they passively become slightly more certain
+        for (int i = 0; i < greenAgentCount; i++) {
+            double change = greenAgentsList[i].getUncertainty() - curGreenUncertainties[i];
+
+            //Uncertainty decreased
+            if (change < 0) {
+                change *= -1;
+                //Check if its below the threshold
+                if (change < CHANGENEGATIVETHRESHOLD) {
+                    double increase = CHANGENEGATIVETHRESHOLD - change;
+                    greenAgentsList[i].setUncertainty(greenAgentsList[i].getUncertainty() - increase);
+                }
+            }
+            //Uncertainty increased
+            else {
+                //Check if its below the threshold
+                if (change < CHANGEPOSITIVETHRESHOLD) {
+                    double increase = CHANGENEGATIVETHRESHOLD - change;
+                    greenAgentsList[i].setUncertainty(greenAgentsList[i].getUncertainty() - increase);
                 }
             }
         }
