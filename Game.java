@@ -24,6 +24,8 @@ public class Game {
     
     final double CHANGEPOSITIVETHRESHOLD = 0.05; //Threshold if uncerainty increases
     final double CHANGENEGATIVETHRESHOLD  = 0.15; //Threshold if uncertainty decreases
+
+    final double PULLUPSCALEFACTOR = 1.2; //This is a factor mutliplied to the increase value (of the weaker node) when two nodes agree
     
     /**
      * Creates an instance of the game using the input parameters
@@ -227,11 +229,13 @@ public class Game {
                     //Second agent is more certain 
                     if (error > 0) {
                         firstOutput = (1 - firstUncertainty) * (error / 2) + firstUncertainty;
+                        firstOutput *= PULLUPSCALEFACTOR;
                     }
                     //First agent is more certain
                     else {
                         error *= -1;
                         secondOutput = (1 - secondUncertainty) * (error / 2) + secondUncertainty;
+                        secondOutput *= PULLUPSCALEFACTOR;
                     }
                 }
 
