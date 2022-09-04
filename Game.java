@@ -16,6 +16,9 @@ public class Game {
     private int greyAgentCount;
 
     final double OPINIONTHRESHOLD = 0.6; //Above this uncertainty inclusively, an agents opinion can change
+    final double FLIPUPPERBOUND = 0.8; //Upperbound of the increase when flipping opinion
+    final double FLIPLOWERBOUND = 0.4; //Lowerbound of the increase when flipping opinion
+
     final int OPINIONSCALEFACTOR = 1000; //Used in calculations, the higher the value the greater accuracy
     final double OPINIONSETAFTERCHANGE = 0.6; //If an agents opinion changes, this is what their uncerainty becomes 
     
@@ -251,7 +254,13 @@ public class Game {
                     //This means their opinion changes
                     if (randomNumber <= firstAgentMapped) {
                         firstAgent.setVotingOpinion(!firstAgent.getVotingOpinion());
-                        firstAgent.setUncertainty(OPINIONSETAFTERCHANGE);
+                        
+                        //Pick a random value to increase by based on the given range.
+                        int range = (int)((FLIPUPPERBOUND - FLIPLOWERBOUND) / OPINIONSCALEFACTOR);
+                        double increase = opinionGenerator.nextInt(range);
+                        increase /= OPINIONSCALEFACTOR;
+
+                        firstAgent.setUncertainty(firstAgent.getUncertainty() - increase);
                     }
                 }
 
@@ -265,7 +274,13 @@ public class Game {
                     //This means their opinion changes
                     if (randomNumber <= secondAgentMapped) {
                         secondAgent.setVotingOpinion(!secondAgent.getVotingOpinion());
-                        secondAgent.setUncertainty(OPINIONSETAFTERCHANGE);
+                        
+                        //Pick a random value to increase by based on the given range.
+                        int range = (int)((FLIPUPPERBOUND - FLIPLOWERBOUND) / OPINIONSCALEFACTOR);
+                        double increase = opinionGenerator.nextInt(range);
+                        increase /= OPINIONSCALEFACTOR;
+
+                        secondAgent.setUncertainty(firstAgent.getUncertainty() - increase);
                     }
                 }
             }
