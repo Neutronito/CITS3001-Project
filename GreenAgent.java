@@ -55,6 +55,8 @@ public class GreenAgent {
     public void setUncertainty(double inputUncertainty) {
         if (inputUncertainty >= -1 && inputUncertainty <= 1) {
             uncertainty = inputUncertainty;
+        } else {
+            throw new IllegalArgumentException("Error, the uncertainty to set must be within the range -1 to 1 inclusively.");
         }
     }
     
