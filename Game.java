@@ -293,7 +293,7 @@ public class Game {
                         double increase = opinionGenerator.nextInt(range);
                         increase /= OPINIONSCALEFACTOR;
 
-                        secondAgent.setUncertainty(firstAgent.getUncertainty() - increase);
+                        secondAgent.setUncertainty(secondAgent.getUncertainty() - increase);
                     }
                 }
             }
