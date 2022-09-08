@@ -49,14 +49,16 @@ public class GreenAgent {
     }
 
     /**
-     * Setter for the uncertainty of the green agent
+     * Setter for the uncertainty of the green agent, includes an error check and will simply force the uncertainty to be within bounds
      * @param inputUncertainty The value to set the uncerainty to
      */
     public void setUncertainty(double inputUncertainty) {
         if (inputUncertainty >= -1 && inputUncertainty <= 1) {
             uncertainty = inputUncertainty;
+        } else if (inputUncertainty < -1) {
+            uncertainty = -1;
         } else {
-            throw new IllegalArgumentException("Error, the uncertainty to set must be within the range -1 to 1 inclusively.");
+            uncertainty = 1;
         }
     }
     
