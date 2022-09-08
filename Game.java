@@ -241,6 +241,13 @@ public class Game {
                     }
                 }
 
+                //Make sure the uncertainties have legal bounds
+                if (firstOutput < -1) firstOutput = -1;
+                if (firstOutput > 1) firstOutput = 1;
+
+                if (secondOutput < -1) secondOutput = -1;
+                if (secondOutput > 1) secondOutput = 1; 
+
                 //Update uncertainties at the end. This is done to keep the code simple.
                 //However, we can liken this to the agents going home and thinking about the conversation, and then changing their mindset so it is realistic.
                 firstAgent.setUncertainty(firstOutput);
