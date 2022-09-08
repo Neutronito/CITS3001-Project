@@ -27,6 +27,8 @@ public class Game {
 
     final double PULLUPSCALEFACTOR = 1.2; //This is a factor mutliplied to the increase value (of the weaker node) when two nodes agree
     
+    final double[] POTENCYRANGE = {0.1, 0.4}; //This is the potency effect range of the map from the red message potency
+
     /**
      * Creates an instance of the game using the input parameters
      * @param greenAgentCount The number of green nodes to exist in the nework
@@ -313,6 +315,83 @@ public class Game {
                 }
             }
         }
+    }
+
+
+    /**
+     * Executes the red turn, based on the given message potency.
+     * @param messagePotency The message potency from 1 to 6 inclusive, the higher the number the more potent.
+     */
+    public void executeRedTurn(int messagePotency) {
+        
+        //Error handling
+        if (messagePotency <= 0 || messagePotency > 6) {
+            throw new IllegalArgumentException("Error, the message potency must be within the range 0 to 5 inclusively.");
+        }
+
+        double mappedPotency = 0;
+
+        //Map the message potency
+        if (messagePotency <= 3) {
+            mappedPotency = POTENCYRANGE[0] + ((POTENCYRANGE[1] - POTENCYRANGE[0]) / 2) * (messagePotency - 1); 
+            mappedPotency *= -1;
+        } else {
+            messagePotency -= 3;
+            mappedPotency = POTENCYRANGE[0] + ((POTENCYRANGE[1] - POTENCYRANGE[0]) / 2) * (messagePotency - 1);
+        }
+
+        /*
+         * ASIDE:
+         * 
+         * If the potency is 3 or less, it has a negative effect (i.e. the opposite) of what is mentioned below.
+         * The smaller the number, the more negative the effect.
+         * 
+         * If the potency is 4 or more, then it has the effect as stated below.
+         * The bigger the number, the greater the effect.  
+         */
+        //Loop through all the agents
+        for (GreenAgent curAgent : greenAgentsList) {
+            double newUncertainty = curAgent.getUncertainty();
+
+            //Agent is on the blue team
+            if (curAgent.getVotingOpinion()) {
+
+                //The agent is "certain", so their uncertainty decreases
+                if (curAgent.getUncertainty() < 0) {
+                    newUncertainty -= mappedPotency;
+
+                }
+
+                //The agent is "uncertain", so their uncertainty increases
+                else {
+                    newUncertainty += mappedPotency;
+                }
+            }
+
+            //Agent is on the red team
+            else {
+                //The agent is "certain", so their uncertainty increases
+                if (curAgent.getUncertainty() < 0) {
+                    newUncertainty += mappedPotency;
+                }
+
+                //The agent is "uncertain", so their uncertainty decreases
+                else {
+                    newUncertainty -= mappedPotency;
+                }
+            }
+
+            //Make sure the uncertainty is within a legal range
+            if (newUncertainty < -1) {
+                newUncertainty = -1;
+            } else if (newUncertainty > 1) {
+                newUncertainty = 1;
+            }
+
+            //We can now set it
+            curAgent.setUncertainty(newUncertainty);
+        }
+
     }
 
     /**
