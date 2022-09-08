@@ -333,6 +333,8 @@ public class Game {
 
         //Map the message potency
         if (messagePotency <= 3) {
+            //inverse map potency, 1 highest 3 lowest
+            messagePotency = 4 - messagePotency;
             mappedPotency = POTENCYRANGE[0] + ((POTENCYRANGE[1] - POTENCYRANGE[0]) / 2) * (messagePotency - 1); 
             mappedPotency *= -1;
         } else {
