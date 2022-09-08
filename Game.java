@@ -15,19 +15,19 @@ public class Game {
     private GreyAgent[] greyAgentsList;
     private int greyAgentCount;
 
-    final double OPINIONTHRESHOLD = 0.6; //Above this uncertainty inclusively, an agents opinion can change
-    final double FLIPUPPERBOUND = 0.8; //Upperbound of the increase when flipping opinion
-    final double FLIPLOWERBOUND = 0.4; //Lowerbound of the increase when flipping opinion
+    private final double OPINIONTHRESHOLD = 0.6; //Above this uncertainty inclusively, an agents opinion can change
+    private final double FLIPUPPERBOUND = 0.8; //Upperbound of the increase when flipping opinion
+    private final double FLIPLOWERBOUND = 0.4; //Lowerbound of the increase when flipping opinion
 
-    final int OPINIONSCALEFACTOR = 1000; //Used in calculations, the higher the value the greater accuracy
-    final double OPINIONSETAFTERCHANGE = 0.6; //If an agents opinion changes, this is what their uncerainty becomes 
+    private final int OPINIONSCALEFACTOR = 1000; //Used in calculations, the higher the value the greater accuracy
+    private final double OPINIONSETAFTERCHANGE = 0.6; //If an agents opinion changes, this is what their uncerainty becomes 
     
-    final double CHANGEPOSITIVETHRESHOLD = 0.05; //Threshold if uncerainty increases
-    final double CHANGENEGATIVETHRESHOLD  = 0.15; //Threshold if uncertainty decreases
+    private final double CHANGEPOSITIVETHRESHOLD = 0.05; //Threshold if uncerainty increases
+    private final double CHANGENEGATIVETHRESHOLD  = 0.15; //Threshold if uncertainty decreases
 
-    final double PULLUPSCALEFACTOR = 1.2; //This is a factor mutliplied to the increase value (of the weaker node) when two nodes agree
+    private final double PULLUPSCALEFACTOR = 1.2; //This is a factor mutliplied to the increase value (of the weaker node) when two nodes agree
     
-    final double[] POTENCYRANGE = {0.1, 0.4}; //This is the potency effect range of the map from the red message potency
+    private final double[] POTENCYRANGE = {0.1, 0.4}; //This is the potency effect range of the map from the red message potency
 
     /**
      * Creates an instance of the game using the input parameters
