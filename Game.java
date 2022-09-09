@@ -384,14 +384,9 @@ public class Game {
     public void executeBlueTurn1(int messagePotency) {
         //Get mapped potency
         double mappedPotency = handleMessagePotency(messagePotency);
-        /*
-         *  Assuming super potent message:
-         *  on red team and certain     - uncertainty decrease & lose energy
-         *  on red team and uncertain   - uncertainty increase
-         *  on blue team and certain    - uncertainty increase & lose energy
-         *  on blue team and uncertain  - uncertainty decrease
-         *  the more potent the message, the more effect it has 
-         */
+        // Agent is certain if uncertainty is less than 0, therefore causing energy loss
+        // The more certain an agent, the higher the energy loss
+
         //Loop through all the green agents
         for (GreenAgent curAgent : greenAgentsList) {
             double newUncertainty = curAgent.getUncertainty();
@@ -551,8 +546,28 @@ public class Game {
         }
     }
 
+    /**
+     * Prints out the blue agent energy level status
+     */
     public void printBlueEnergyLevel() {
         System.out.println(String.format("Blue Agent energy level is at %d%%.", blueAgent.getEnergyLevel()));
+    }
+
+    public boolean blueWins() {
+        int greenYes = 0;   //Number of green agents who ARE voting with uncertainty less than 0
+        int greenNo = 0;    //Number of green agents who ARE NOT voting with uncertainty less than 0
+        
+        for (int i = 0; i < greenAgentCount; i++) {
+            //Increment the voting counter
+            if (greenAgentsList[i].getVotingOpinion() && greenAgentsList[i].getUncertainty() < 0) {
+                greenYes++;
+            }
+            if (!greenAgentsList[i].getVotingOpinion() && greenAgentsList[i].getUncertainty() < 0) {
+                greenNo++;
+            }
+        }
+        
+        return (greenYes > greenNo);
     }
 }
 

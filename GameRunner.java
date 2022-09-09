@@ -51,7 +51,7 @@ public class GameRunner {
         gameInstance.printGreenStatistics();
         Scanner scanner = new Scanner(System.in);
         boolean triggerGameEnd = false;         //True when game end is triggered, false when game is running
-        
+
         while (!triggerGameEnd) {
             //Execute the red turn
             System.out.println("\nRED AGENT'S TURN");
@@ -80,9 +80,18 @@ public class GameRunner {
             triggerGameEnd = gameInstance.triggerGameEnd();  //NOT DONE - triggerGameEnd becomes true when blue energy level is depleted 
         }
         scanner.close();
+        if (gameInstance.blueWins()) {
+            System.out.println("Blue Agent wins!");
+        } else {
+            System.out.println("Red Agent wins!");
+        }
         return 0;
     }
 
+    /**
+     * Getter for the blue turn option via user input.
+     * @return The blue turn option.
+     */
     public int getBlueOption() {
         Scanner scanner = new Scanner(System.in);
         String userChoice = "blank";
@@ -156,6 +165,11 @@ public class GameRunner {
         return true;
     }
 
+    /**
+     * Returns true if the user input blue turn option is valid (between 1 and 6), false otherwise.
+     * @param userInput The user input used for blue turn option.
+     * @return True if the user input blue turn option is valid (between 1 and 6), false otherwise.
+     */
     public boolean correctOptionInputFormat(String userChoice) {
         //No input yet
         if (userChoice == "blank") {
