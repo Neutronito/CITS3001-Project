@@ -16,6 +16,7 @@ public class Game {
     private int greyAgentCount;
 
     private BlueAgent blueAgent;
+    private RedAgent redAgent;
 
     private final double OPINIONTHRESHOLD = 0.6; //Above this uncertainty inclusively, an agents opinion can change
     private final double FLIPUPPERBOUND = 0.8; //Upperbound of the increase when flipping opinion
@@ -166,6 +167,7 @@ public class Game {
 
         //Create the blue agent
         blueAgent = new BlueAgent();
+        redAgent = new RedAgent(greenAgentCount);
     }
 
     /**
@@ -325,53 +327,45 @@ public class Game {
     /**
      * Executes the red turn, based on the given message potency.
      * @param messagePotency The message potency from 1 to 6 inclusive, the higher the number the more potent.
+     * @param byGreySpy True if grey spy interacts with green team without followers, false otherwise.
      */
-    public void executeRedTurn(int messagePotency) {
+    public void executeRedTurn(int messagePotency, boolean byGreySpy) {
         //Get mapped potency
         double mappedPotency = handleMessagePotency(messagePotency);
-
+        if (!byGreySpy) {
+            //todo lose followers
+        }
         /*
          * ASIDE:
-         * 
          * If the potency is 3 or less, it has a negative effect (i.e. the opposite) of what is mentioned below.
          * The smaller the number, the more negative the effect.
-         * 
          * If the potency is 4 or more, then it has the effect as stated below.
          * The bigger the number, the greater the effect.  
          */
         //Loop through all the agents
         for (GreenAgent curAgent : greenAgentsList) {
             double newUncertainty = curAgent.getUncertainty();
-
-            //Agent is on the blue team
-            if (curAgent.getVotingOpinion()) {
-
+            
+            if (curAgent.getVotingOpinion()) {  //Agent is on the blue team
                 //The agent is "certain", so their uncertainty decreases
                 if (curAgent.getUncertainty() < 0) {
                     newUncertainty -= mappedPotency;
-
                 }
-
                 //The agent is "uncertain", so their uncertainty increases
                 else {
                     newUncertainty += mappedPotency;
                 }
             }
-
-            //Agent is on the red team
-            else {
+            else {  //Agent is on the red team
                 //The agent is "certain", so their uncertainty increases
                 if (curAgent.getUncertainty() < 0) {
                     newUncertainty += mappedPotency;
                 }
-
                 //The agent is "uncertain", so their uncertainty decreases
                 else {
                     newUncertainty -= mappedPotency;
                 }
             }
-
-            //We can now set it
             curAgent.setUncertainty(newUncertainty);
         }
 
@@ -393,7 +387,7 @@ public class Game {
         for (GreenAgent curAgent : greenAgentsList) {
             double newUncertainty = curAgent.getUncertainty();
 
-            if (curAgent.getVotingOpinion()) { //Agent is on the blue team
+            if (curAgent.getVotingOpinion()) {  //Agent is on the blue team
                 //The agent is "certain", so their uncertainty increases and blue loses energy
                 if (curAgent.getUncertainty() < 0) {
                     newUncertainty += mappedPotency;
@@ -410,7 +404,7 @@ public class Game {
                     }
                 }
             }
-            else { //Agent is on the red team
+            else {  //Agent is on the red team
                 //The agent is "certain", so their uncertainty decreases and blue loses energy
                 if (curAgent.getUncertainty() < 0) {
                     if (!byGreyAgent) {
@@ -444,8 +438,7 @@ public class Game {
         }
         //Grey Agent is a spy from the read team
         else {
-            executeRedTurn(messagePotency);
-            //todo red team executes turn without losing followers
+            executeRedTurn(messagePotency, true);
         }
     }
 
@@ -562,6 +555,13 @@ public class Game {
      */
     public void printBlueEnergyLevel() {
         System.out.println(String.format("Blue Agent energy level is at %d%%.", blueAgent.getEnergyLevel()));
+    }
+
+    /**
+     * Prints out the red agent follower count
+     */
+    public void printRedFollowerCount() {
+        System.out.println(String.format("Red Agent follower count is %d.", redAgent.getFollowerCount()));
     }
 
     /**

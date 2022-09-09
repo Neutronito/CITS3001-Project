@@ -56,7 +56,7 @@ public class GameRunner {
             //Execute the red turn
             System.out.println("\nRED AGENT'S TURN");
             int redPotency = getMessagePotency("red");
-            gameInstance.executeRedTurn(redPotency);
+            gameInstance.executeRedTurn(redPotency, false);
 
             //Execute the blue turn
             System.out.println("\nBLUE AGENT'S TURN");
@@ -76,6 +76,7 @@ public class GameRunner {
             gameInstance.printGreenAgents();
             gameInstance.printGreenStatistics();
             gameInstance.printBlueEnergyLevel();
+            gameInstance.printRedFollowerCount();
             
             triggerGameEnd = gameInstance.triggerGameEnd();  //NOT DONE - triggerGameEnd becomes true when blue energy level is depleted 
         }
