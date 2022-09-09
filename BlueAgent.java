@@ -31,6 +31,9 @@ public class BlueAgent {
      */
     public void incrementEnergy(int increasedAmount) {
         energyLevel = energyLevel + increasedAmount;
+        if (energyLevel > 100) {
+            energyLevel = 100;
+        }
     }
 
     /**
@@ -39,6 +42,9 @@ public class BlueAgent {
      */
     public void decrementEnergy(int decreasedAmount) {
         energyLevel = energyLevel - decreasedAmount;
+        if (energyLevel < 0) {
+            energyLevel = 0;
+        }
     }
 
     /**

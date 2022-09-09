@@ -75,6 +75,7 @@ public class GameRunner {
             //Print the metrics now
             gameInstance.printGreenAgents();
             gameInstance.printGreenStatistics();
+            gameInstance.printBlueEnergyLevel();
             
             triggerGameEnd = gameInstance.triggerGameEnd();  //NOT DONE - triggerGameEnd becomes true when blue energy level is depleted 
         }

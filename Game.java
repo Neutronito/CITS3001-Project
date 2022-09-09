@@ -322,7 +322,6 @@ public class Game {
         }
     }
 
-
     /**
      * Executes the red turn, based on the given message potency.
      * @param messagePotency The message potency from 1 to 6 inclusive, the higher the number the more potent.
@@ -421,6 +420,7 @@ public class Game {
                 //The agent is "certain", so their uncertainty decreases and blue loses energy
                 if (curAgent.getUncertainty() < 0) {
                     newUncertainty -= mappedPotency;
+                    blueAgent.decrementEnergy(1);
                     // todo energy loss
                 }
 
@@ -549,6 +549,10 @@ public class Game {
                 System.out.println("Red");
             }
         }
+    }
+
+    public void printBlueEnergyLevel() {
+        System.out.println(String.format("Blue Agent energy level is at %d%%.", blueAgent.getEnergyLevel()));
     }
 }
 
