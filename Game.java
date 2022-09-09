@@ -15,6 +15,8 @@ public class Game {
     private GreyAgent[] greyAgentsList;
     private int greyAgentCount;
 
+    private BlueAgent blueAgent;
+
     private final double OPINIONTHRESHOLD = 0.6; //Above this uncertainty inclusively, an agents opinion can change
     private final double FLIPUPPERBOUND = 0.8; //Upperbound of the increase when flipping opinion
     private final double FLIPLOWERBOUND = 0.4; //Lowerbound of the increase when flipping opinion
@@ -27,7 +29,7 @@ public class Game {
 
     private final double PULLUPSCALEFACTOR = 1.2; //This is a factor mutliplied to the increase value (of the weaker node) when two nodes agree
     
-    private final double[] POTENCYRANGE = {0.1, 0.4}; //This is the potency effect range of the map from the red message potency
+    private final double[] POTENCYRANGE = {0.1, 0.4}; //This is the potency effect range of the map from the red and blue message potency
 
     /**
      * Creates an instance of the game using the input parameters
@@ -161,6 +163,9 @@ public class Game {
             greyAgentsRandom.remove(generatedIndex);
             total--;
         }
+
+        //Create the blue agent
+        blueAgent = new BlueAgent();
     }
 
     /**
@@ -323,24 +328,8 @@ public class Game {
      * @param messagePotency The message potency from 1 to 6 inclusive, the higher the number the more potent.
      */
     public void executeRedTurn(int messagePotency) {
-        
-        //Error handling
-        if (messagePotency <= 0 || messagePotency > 6) {
-            throw new IllegalArgumentException("Error, the message potency must be within the range 0 to 5 inclusively.");
-        }
-
-        double mappedPotency = 0;
-
-        //Map the message potency
-        if (messagePotency <= 3) {
-            //inverse map potency, 1 highest 3 lowest
-            messagePotency = 4 - messagePotency;
-            mappedPotency = POTENCYRANGE[0] + ((POTENCYRANGE[1] - POTENCYRANGE[0]) / 2) * (messagePotency - 1); 
-            mappedPotency *= -1;
-        } else {
-            messagePotency -= 3;
-            mappedPotency = POTENCYRANGE[0] + ((POTENCYRANGE[1] - POTENCYRANGE[0]) / 2) * (messagePotency - 1);
-        }
+        //Get mapped potency
+        double mappedPotency = handleMessagePotency(messagePotency);
 
         /*
          * ASIDE:
@@ -387,6 +376,104 @@ public class Game {
             curAgent.setUncertainty(newUncertainty);
         }
 
+    }
+
+    /**
+     * Executes the blue turn option 1 to interact with green team, based on the given message potency.
+     * @param messagePotency The message potency from 1 to 6 inclusive, the higher the number the more potent.
+     */
+    public void executeBlueTurn1(int messagePotency) {
+        //Get mapped potency
+        double mappedPotency = handleMessagePotency(messagePotency);
+        /*
+         *  Assuming super potent message:
+         *  on red team and certain     - uncertainty decrease & lose energy
+         *  on red team and uncertain   - uncertainty increase
+         *  on blue team and certain    - uncertainty increase & lose energy
+         *  on blue team and uncertain  - uncertainty decrease
+         *  the more potent the message, the more effect it has 
+         */
+        //Loop through all the green agents
+        for (GreenAgent curAgent : greenAgentsList) {
+            double newUncertainty = curAgent.getUncertainty();
+
+            //Agent is on the blue team
+            if (curAgent.getVotingOpinion()) {
+
+                //The agent is "certain", so their uncertainty increases and blue loses energy
+                if (curAgent.getUncertainty() < 0) {
+                    newUncertainty += mappedPotency;
+                    blueAgent.decrementEnergy(1);
+                    // NOT DONE YET, needa figure out how 
+                    // energy gain and loss works for game to keep going
+                    // todo energy loss
+                }
+
+                //The agent is "uncertain", so their uncertainty decreases
+                else {
+                    newUncertainty -= mappedPotency;
+                    // todo energy (?)
+                }
+            }
+
+            //Agent is on the red team
+            else {
+                //The agent is "certain", so their uncertainty decreases and blue loses energy
+                if (curAgent.getUncertainty() < 0) {
+                    newUncertainty -= mappedPotency;
+                    // todo energy loss
+                }
+
+                //The agent is "uncertain", so their uncertainty increases
+                else {
+                    newUncertainty += mappedPotency;
+                    // todo energy (?)
+                }
+            }
+            curAgent.setUncertainty(newUncertainty);
+        }
+
+    }
+
+    /**
+     * Executes the blue turn option 2 to let a grey agent into the green network.
+     */
+    public void executeBlueTurn2() {
+        // todo
+    }
+
+    /**
+     * Handles the error checking and calculation of the given message potency. 
+     * @param messagePotency The message potency from 1 to 6 inclusive, the higher the number the more potent.
+     * @return The mapped potency.
+     */
+    public double handleMessagePotency(int messagePotency) {
+        //Error handling
+        if (messagePotency <= 0 || messagePotency > 6) {
+            throw new IllegalArgumentException("Error, the message potency must be within the range 0 to 5 inclusively.");
+        }
+
+        double mappedPotency = 0;
+
+        //Map the message potency
+        if (messagePotency <= 3) {
+            //inverse map potency, 1 highest 3 lowest
+            messagePotency = 4 - messagePotency;
+            mappedPotency = POTENCYRANGE[0] + ((POTENCYRANGE[1] - POTENCYRANGE[0]) / 2) * (messagePotency - 1); 
+            mappedPotency *= -1;
+        } else {
+            messagePotency -= 3;
+            mappedPotency = POTENCYRANGE[0] + ((POTENCYRANGE[1] - POTENCYRANGE[0]) / 2) * (messagePotency - 1);
+        }
+        return mappedPotency;
+    }
+
+    /**
+     * Triggers game end, returns true if game has ended, false otherwise.
+     * @return True if game has ended, false otherwise.
+     */
+    public boolean triggerGameEnd() {
+        return !blueAgent.hasEnergyLevel();
     }
 
     /**
