@@ -188,6 +188,11 @@ public class GameRunner {
 
     }
 
+    /**
+     * Checks whether the given string is numeric or not.
+     * @param str The given string to be checked.
+     * @return True if the the given string is numeric.
+     */
     public static boolean isNumeric(String str) { 
         try {  
             Integer.parseInt(str);  

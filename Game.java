@@ -529,7 +529,6 @@ public class Game {
         System.out.printf("There are %d agents, %d voting and %d not voting. The average uncertainty is %.4f\n", greenAgentCount, greenYes, greenNo, uncertaintyTotal);
     } 
 
-
     /**
      * Prints out the information of all the grey agents in the game
      */
@@ -553,6 +552,13 @@ public class Game {
         System.out.println(String.format("Blue Agent energy level is at %d%%.", blueAgent.getEnergyLevel()));
     }
 
+    /**
+     * Returns true if blue agent wins when game ends.
+     * Blue agent wins when there is a higher number of green agents voting with uncertainty less than 0.
+     * Returns false if red agent wins when game ends.
+     * Red agent wins when there is a higher number of green agents not voting with uncertainty less than 0.
+     * @return True if blue agent wins when game ends, false if red agent wins when game ends.
+     */
     public boolean blueWins() {
         int greenYes = 0;   //Number of green agents who ARE voting with uncertainty less than 0
         int greenNo = 0;    //Number of green agents who ARE NOT voting with uncertainty less than 0
