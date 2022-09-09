@@ -52,9 +52,6 @@ public class BlueAgent {
      * @return true if energy level has not depleted, false if there is no more energy 
      */
     public boolean hasEnergyLevel() {
-        if (energyLevel != 0) {
-            return true;
-        }
-        return false;
+        return (energyLevel != 0);
     }
 }

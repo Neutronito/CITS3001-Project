@@ -61,11 +61,11 @@ public class GameRunner {
             //Execute the blue turn
             System.out.println("\nBLUE AGENT'S TURN");
             int userBlueChoice = getBlueOption();
+            int bluePotency = getMessagePotency("blue");
             if (userBlueChoice == 1) {
-                int bluePotency = getMessagePotency("blue");
-                gameInstance.executeBlueTurn1(bluePotency);
+                gameInstance.executeBlueTurn1(bluePotency, false);
             } else if (userBlueChoice == 2) {
-                gameInstance.executeBlueTurn2();
+                gameInstance.executeBlueTurn2(bluePotency);
             }
             
             //Execute the green turn

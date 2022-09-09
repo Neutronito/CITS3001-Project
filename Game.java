@@ -380,10 +380,12 @@ public class Game {
     /**
      * Executes the blue turn option 1 to interact with green team, based on the given message potency.
      * @param messagePotency The message potency from 1 to 6 inclusive, the higher the number the more potent.
+     * @param byGreyAgent True if grey agent interacts with green team without losing energy, false otherwise.
      */
-    public void executeBlueTurn1(int messagePotency) {
+    public void executeBlueTurn1(int messagePotency, boolean byGreyAgent) {
         //Get mapped potency
         double mappedPotency = handleMessagePotency(messagePotency);
+
         // Agent is certain if uncertainty is less than 0, therefore causing energy loss
         // The more certain an agent, the higher the energy loss
 
@@ -391,50 +393,60 @@ public class Game {
         for (GreenAgent curAgent : greenAgentsList) {
             double newUncertainty = curAgent.getUncertainty();
 
-            //Agent is on the blue team
-            if (curAgent.getVotingOpinion()) {
-
+            if (curAgent.getVotingOpinion()) { //Agent is on the blue team
                 //The agent is "certain", so their uncertainty increases and blue loses energy
                 if (curAgent.getUncertainty() < 0) {
                     newUncertainty += mappedPotency;
-                    blueAgent.decrementEnergy(1);
-                    // NOT DONE YET, needa figure out how 
-                    // energy gain and loss works for game to keep going
-                    // todo energy loss
+                    if (!byGreyAgent) {
+                        blueAgent.decrementEnergy(1);
+                        // todo energy loss
+                    }
                 }
-
                 //The agent is "uncertain", so their uncertainty decreases
                 else {
                     newUncertainty -= mappedPotency;
-                    // todo energy (?)
+                    if (!byGreyAgent) {
+                        // todo energy (?)
+                    }
                 }
             }
-
-            //Agent is on the red team
-            else {
+            else { //Agent is on the red team
                 //The agent is "certain", so their uncertainty decreases and blue loses energy
                 if (curAgent.getUncertainty() < 0) {
-                    newUncertainty -= mappedPotency;
-                    blueAgent.decrementEnergy(1);
-                    // todo energy loss
+                    if (!byGreyAgent) {
+                        blueAgent.decrementEnergy(1);
+                        // todo energy loss
+                    }
                 }
-
                 //The agent is "uncertain", so their uncertainty increases
                 else {
                     newUncertainty += mappedPotency;
-                    // todo energy (?)
+                    if (!byGreyAgent) {
+                        // todo energy (?)
+                    }
                 }
             }
             curAgent.setUncertainty(newUncertainty);
         }
-
     }
 
     /**
      * Executes the blue turn option 2 to let a grey agent into the green network.
      */
-    public void executeBlueTurn2() {
-        // todo
+    public void executeBlueTurn2(int messagePotency) {
+        Random indexGenerator = new Random();
+        int greyAgentIndex = indexGenerator.nextInt(greyAgentCount);
+        GreyAgent greyAgent = greyAgentsList[greyAgentIndex];
+        System.out.printf("\nGrey Agent %d chosen is from %s team.\n", greyAgentIndex, greyAgent.getBlueTeamStatus() ? "blue" : "red");
+        //Grey Agent is on the blue team
+        if (greyAgent.getBlueTeamStatus()) {
+            executeBlueTurn1(messagePotency, true);
+        }
+        //Grey Agent is a spy from the read team
+        else {
+            executeRedTurn(messagePotency);
+            //todo red team executes turn without losing followers
+        }
     }
 
     /**
