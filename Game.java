@@ -327,14 +327,11 @@ public class Game {
     /**
      * Executes the red turn, based on the given message potency.
      * @param messagePotency The message potency from 1 to 6 inclusive, the higher the number the more potent.
-     * @param byGreySpy True if grey spy interacts with green team without followers, false otherwise.
+     * @param byGreySpy True if grey spy interacts with green team without losing followers, false otherwise.
      */
     public void executeRedTurn(int messagePotency, boolean byGreySpy) {
         //Get mapped potency
         double mappedPotency = handleMessagePotency(messagePotency);
-        if (!byGreySpy) {
-            //todo lose followers
-        }
         /*
          * ASIDE:
          * If the potency is 3 or less, it has a negative effect (i.e. the opposite) of what is mentioned below.
@@ -342,10 +339,27 @@ public class Game {
          * If the potency is 4 or more, then it has the effect as stated below.
          * The bigger the number, the greater the effect.  
          */
-        //Loop through all the agents
-        for (GreenAgent curAgent : greenAgentsList) {
-            double newUncertainty = curAgent.getUncertainty();
+
+        //Loop through a number of random green agents
+        //Number depends on the red agent follower count
+        Random indexGenerator = new Random();   
+        ArrayList<Integer> interactedGreens = new ArrayList<>(); 
+        System.out.println(redAgent.getFollowerCount());
+        for (int i = 0; i < redAgent.getFollowerCount(); i++) {
             
+            //Get random green agent
+            int greenIndex = indexGenerator.nextInt(redAgent.getFollowerCount());
+            System.out.printf("\nFirst agent is %d\n", greenIndex);
+            //Check if the green agent has already interacted or not
+            while(interactedGreens.contains(greenIndex)) {
+                greenIndex = indexGenerator.nextInt(redAgent.getFollowerCount());
+                System.out.printf("Next one is %d\n", greenIndex);
+            }
+
+            //Green agent has not interacted yet, so interact now
+            interactedGreens.add(greenIndex); 
+            GreenAgent curAgent = greenAgentsList[greenIndex];
+            double newUncertainty = curAgent.getUncertainty();
             if (curAgent.getVotingOpinion()) {  //Agent is on the blue team
                 //The agent is "certain", so their uncertainty decreases
                 if (curAgent.getUncertainty() < 0) {
@@ -368,7 +382,11 @@ public class Game {
             }
             curAgent.setUncertainty(newUncertainty);
         }
-
+        if (!byGreySpy) {
+            if (messagePotency >= 3) { // TODO MAKE SMARTER
+                redAgent.decrementFollower(1); // TODO MAKE SMARTER
+            }
+        }
     }
 
     /**
