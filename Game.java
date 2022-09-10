@@ -207,7 +207,6 @@ public class Game {
                 if (firstOpinion != secondOpinion) {
                     
                     //This is for first agent
-
                     double error = (firstUncertainty + 1) - (secondUncertainty + 1);
                   
                     if (error >= 0) {
@@ -218,7 +217,6 @@ public class Game {
                     }
 
                     //This is for the second agent
-
                     error = (secondUncertainty + 1) - (firstUncertainty + 1);
                   
                     if (error >= 0) {
@@ -232,6 +230,7 @@ public class Game {
                 
                 //They have the same opinion.
                 else {
+
                     //Effectively, the more certain agent will pull up the least certain agent
                     double error = (firstUncertainty + 1) - (secondUncertainty + 1);
 
@@ -253,49 +252,9 @@ public class Game {
                 firstAgent.setUncertainty(firstOutput);
                 secondAgent.setUncertainty(secondOutput);
 
-                //Now, based upon their uncertainty, an agents opinion can change.
-                //The probability of an opinion changing is based upon how far into the threshold it is
-                Random opinionGenerator = new Random();
-                
-                //Check if agent one is above the threshold
-                if (firstAgent.getUncertainty() > OPINIONTHRESHOLD) {
-                    //Note, we assume the threshold is always positive
-                    int thresholdRange = (int)((1 - OPINIONTHRESHOLD) * OPINIONSCALEFACTOR);
-                    int randomNumber = opinionGenerator.nextInt(thresholdRange);
-                    int firstAgentMapped = (int)((firstAgent.getUncertainty() - OPINIONTHRESHOLD) * OPINIONSCALEFACTOR);
-                    
-                    //This means their opinion changes
-                    if (randomNumber <= firstAgentMapped) {
-                        firstAgent.setVotingOpinion(!firstAgent.getVotingOpinion());
-                        
-                        //Pick a random value to increase by based on the given range.
-                        int range = (int)((FLIPUPPERBOUND - FLIPLOWERBOUND) * OPINIONSCALEFACTOR);
-                        double increase = opinionGenerator.nextInt(range);
-                        increase /= OPINIONSCALEFACTOR;
-
-                        firstAgent.setUncertainty(firstAgent.getUncertainty() - increase);
-                    }
-                }
-
-                //Check if the second agent is above the threshold
-                if (secondAgent.getUncertainty() > OPINIONTHRESHOLD) {
-                    //Note, we assume the threshold is always positive
-                    int thresholdRange = (int)((1 - OPINIONTHRESHOLD) * OPINIONSCALEFACTOR);
-                    int randomNumber = opinionGenerator.nextInt(thresholdRange);
-                    int secondAgentMapped = (int)((secondAgent.getUncertainty() - OPINIONTHRESHOLD) * OPINIONSCALEFACTOR);
-                    
-                    //This means their opinion changes
-                    if (randomNumber <= secondAgentMapped) {
-                        secondAgent.setVotingOpinion(!secondAgent.getVotingOpinion());
-                        
-                        //Pick a random value to increase by based on the given range.
-                        int range = (int)((FLIPUPPERBOUND - FLIPLOWERBOUND) * OPINIONSCALEFACTOR);
-                        double increase = opinionGenerator.nextInt(range);
-                        increase /= OPINIONSCALEFACTOR;
-
-                        secondAgent.setUncertainty(secondAgent.getUncertainty() - increase);
-                    }
-                }
+                //Change opinion if green agent uncertainty is above the threshold
+                changeGreenOpinion(firstAgent);
+                changeGreenOpinion(secondAgent);
             }
         }
 
@@ -325,6 +284,34 @@ public class Game {
     }
 
     /**
+     * Changes a green agent's opinion based on their uncertainty.
+     * The probability of an opinion changing is based upon how far into the threshold it is.
+     * @param greenAgent The green agent to be considered.
+     */
+    public void changeGreenOpinion(GreenAgent greenAgent) {
+        Random opinionGenerator = new Random();
+        //Check if green agent uncertainty is above the threshold
+        if (greenAgent.getUncertainty() > OPINIONTHRESHOLD) {
+            //Note, we assume the threshold is always positive
+            int thresholdRange = (int)((1 - OPINIONTHRESHOLD) * OPINIONSCALEFACTOR);
+            int randomNumber = opinionGenerator.nextInt(thresholdRange);
+            int greenAgentMapped = (int)((greenAgent.getUncertainty() - OPINIONTHRESHOLD) * OPINIONSCALEFACTOR);
+            
+            //This means their opinion changes
+            if (randomNumber <= greenAgentMapped) {
+                greenAgent.setVotingOpinion(!greenAgent.getVotingOpinion());
+                
+                //Pick a random value to increase by based on the given range.
+                int range = (int)((FLIPUPPERBOUND - FLIPLOWERBOUND) * OPINIONSCALEFACTOR);
+                double increase = opinionGenerator.nextInt(range);
+                increase /= OPINIONSCALEFACTOR;
+
+                greenAgent.setUncertainty(greenAgent.getUncertainty() - increase);
+            }
+        }
+    }
+
+    /**
      * Executes the red turn, based on the given message potency.
      * @param messagePotency The message potency from 1 to 6 inclusive, the higher the number the more potent.
      * @param byGreySpy True if grey spy interacts with green team without losing followers, false otherwise.
@@ -344,16 +331,13 @@ public class Game {
         //Number depends on the red agent follower count
         Random indexGenerator = new Random();   
         ArrayList<Integer> interactedGreens = new ArrayList<>(); 
-        System.out.println(redAgent.getFollowerCount());
         for (int i = 0; i < redAgent.getFollowerCount(); i++) {
             
             //Get random green agent
             int greenIndex = indexGenerator.nextInt(redAgent.getFollowerCount());
-            System.out.printf("\nFirst agent is %d\n", greenIndex);
             //Check if the green agent has already interacted or not
             while(interactedGreens.contains(greenIndex)) {
                 greenIndex = indexGenerator.nextInt(redAgent.getFollowerCount());
-                System.out.printf("Next one is %d\n", greenIndex);
             }
 
             //Green agent has not interacted yet, so interact now
