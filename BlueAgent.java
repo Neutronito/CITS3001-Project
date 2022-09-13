@@ -1,12 +1,13 @@
 public class BlueAgent {
 
     private int energyLevel;
+    final int maxEnergy = 100;
 
     /**
      * Constructor for the blue agent
      */
     public BlueAgent () {
-        energyLevel = 100;
+        energyLevel = maxEnergy;
     }
 
     /**
@@ -22,7 +23,9 @@ public class BlueAgent {
      * @param newEnergyLevel the new blue agent energy level
      */
     public void setEnergyLevel(int newEnergyLevel) {
-        energyLevel = newEnergyLevel;
+        if (newEnergyLevel >= 0 && newEnergyLevel <= maxEnergy) {
+            energyLevel = newEnergyLevel;
+        }
     }
 
     /**
@@ -31,8 +34,8 @@ public class BlueAgent {
      */
     public void incrementEnergy(int increasedAmount) {
         energyLevel = energyLevel + increasedAmount;
-        if (energyLevel > 100) {
-            energyLevel = 100;
+        if (energyLevel > maxEnergy) {
+            energyLevel = maxEnergy;
         }
     }
 

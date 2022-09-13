@@ -167,7 +167,8 @@ public class Game {
 
         //Create the blue agent
         blueAgent = new BlueAgent();
-        redAgent = new RedAgent(greenAgentCount);
+        double redUncertainty = 0.0; //todo
+        redAgent = new RedAgent(greenAgentCount, redUncertainty);
     }
 
     /**
