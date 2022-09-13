@@ -325,9 +325,6 @@ public class Game {
         //Get mapped potency
         double mappedPotency = handleMessagePotency(messagePotency);
 
-        //Get red agent's uncertainty
-        double redUncertainty = 0.0;
-
         //If red turn is not executed by grey spy, decrease follower count
         if (!byGreySpy) {
             if (messagePotency >= 3) {
@@ -355,8 +352,8 @@ public class Game {
             GreenAgent curAgent = greenAgentsList[greenIndex];
             double newUncertainty = curAgent.getUncertainty();
             
-             //Agent is on the blue team
-             if (curAgent.getVotingOpinion()) {
+            //Agent is on the blue team
+            if (curAgent.getVotingOpinion()) {
                 //The agent is "certain", so their uncertainty decreases
                 if (curAgent.getUncertainty() < 0) {
                     newUncertainty -= mappedPotency;
@@ -446,7 +443,7 @@ public class Game {
         else {
             executeRedTurn(messagePotency, true);
         }
-    } 
+    }
 
     /**
      * Handles the error checking and calculation of the given message potency. 
