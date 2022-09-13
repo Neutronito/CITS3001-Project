@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class GreyAgent {
     
     private boolean onBlueTeam; //true if the agent is on the blue team, false if on red team
@@ -24,5 +26,11 @@ public class GreyAgent {
      */
     public void setBlueTeamStatus(boolean inputBlueTeamStatus) {
         onBlueTeam = inputBlueTeamStatus;
+    }
+
+    public int chooseMessage() {
+        Random levelGenerator = new Random();
+        int messagePotency = levelGenerator.nextInt(1, 7);
+        return messagePotency;
     }
 }

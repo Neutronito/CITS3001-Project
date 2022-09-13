@@ -2,39 +2,15 @@ public class RedAgent {
 
     private int maxFollowers;
     private int followerCount;
-    private double uncertainty; 
 
     /**
      * Constructor for the red agent
      */
-    public RedAgent (int greenAgentCount, double uncertaintyValue) {
+    public RedAgent (int greenAgentCount) {
         maxFollowers = greenAgentCount;
         followerCount = greenAgentCount;
-        uncertainty = uncertaintyValue;
     }
-
-    /**
-     * Getter for the uncertainty of the green agent
-     * @return The uncertainty value
-     */
-    public double getUncertainty() {
-        return uncertainty;
-    }
-
-    /**
-     * Setter for the uncertainty of the green agent, includes an error check and will simply force the uncertainty to be within bounds
-     * @param inputUncertainty The value to set the uncerainty to
-     */
-    public void setUncertainty(double inputUncertainty) {
-        if (inputUncertainty >= -1 && inputUncertainty <= 1) {
-            uncertainty = inputUncertainty;
-        } else if (inputUncertainty < -1) {
-            uncertainty = -1;
-        } else {
-            uncertainty = 1;
-        }
-    }
-
+    
     /**
      * Getter for the red agent follower count
      * @return the red agent follower count

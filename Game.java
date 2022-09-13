@@ -32,6 +32,9 @@ public class Game {
     
     private final double[] POTENCYRANGE = {0.1, 0.4}; //This is the potency effect range of the map from the red and blue message potency
 
+    private final double ENERGYSCALEFACTOR = 1.5; //This is a factor mutliplied to calculate the amount of energy loss for blue agent
+    private final double FOLLOWERSCALEFACTOR = 0.025; //This is a factor mutliplied to calculate the amount of follower loss for red agent
+
     /**
      * Creates an instance of the game using the input parameters
      * @param greenAgentCount The number of green nodes to exist in the nework
@@ -167,8 +170,9 @@ public class Game {
 
         //Create the blue agent
         blueAgent = new BlueAgent();
-        double redUncertainty = 0.0; //todo
-        redAgent = new RedAgent(greenAgentCount, redUncertainty);
+
+        //Create the red agent
+        redAgent = new RedAgent(greenAgentCount);
     }
 
     /**
@@ -320,13 +324,18 @@ public class Game {
     public void executeRedTurn(int messagePotency, boolean byGreySpy) {
         //Get mapped potency
         double mappedPotency = handleMessagePotency(messagePotency);
-        /*
-         * ASIDE:
-         * If the potency is 3 or less, it has a negative effect (i.e. the opposite) of what is mentioned below.
-         * The smaller the number, the more negative the effect.
-         * If the potency is 4 or more, then it has the effect as stated below.
-         * The bigger the number, the greater the effect.  
-         */
+
+        //Get red agent's uncertainty
+        double redUncertainty = 0.0;
+
+        //If red turn is not executed by grey spy, decrease follower count
+        if (!byGreySpy) {
+            if (messagePotency >= 3) {
+                int potency = messagePotency - 3;
+                int followerLoss = (int) (greenAgentCount * potency * FOLLOWERSCALEFACTOR);
+                redAgent.decrementFollower(followerLoss); 
+            }
+        }
 
         //Loop through a number of random green agents
         //Number depends on the red agent follower count
@@ -345,32 +354,15 @@ public class Game {
             interactedGreens.add(greenIndex); 
             GreenAgent curAgent = greenAgentsList[greenIndex];
             double newUncertainty = curAgent.getUncertainty();
-            if (curAgent.getVotingOpinion()) {  //Agent is on the blue team
-                //The agent is "certain", so their uncertainty decreases
-                if (curAgent.getUncertainty() < 0) {
-                    newUncertainty -= mappedPotency;
-                }
-                //The agent is "uncertain", so their uncertainty increases
-                else {
-                    newUncertainty += mappedPotency;
-                }
+            //Green agent is on blue team (vote), so increase uncertainty
+            if (curAgent.getVotingOpinion()) {  
+                newUncertainty += mappedPotency;
             }
-            else {  //Agent is on the red team
-                //The agent is "certain", so their uncertainty increases
-                if (curAgent.getUncertainty() < 0) {
-                    newUncertainty += mappedPotency;
-                }
-                //The agent is "uncertain", so their uncertainty decreases
-                else {
-                    newUncertainty -= mappedPotency;
-                }
+            //Green agent is on red team (not vote), so decrease uncertainty
+            else {
+                newUncertainty -= mappedPotency;
             }
             curAgent.setUncertainty(newUncertainty);
-        }
-        if (!byGreySpy) {
-            if (messagePotency >= 3) { // TODO MAKE SMARTER
-                redAgent.decrementFollower(1); // TODO MAKE SMARTER
-            }
         }
     }
 
@@ -383,45 +375,26 @@ public class Game {
         //Get mapped potency
         double mappedPotency = handleMessagePotency(messagePotency);
 
-        // Agent is certain if uncertainty is less than 0, therefore causing energy loss
-        // The more certain an agent, the higher the energy loss
-
         //Loop through all the green agents
         for (GreenAgent curAgent : greenAgentsList) {
             double newUncertainty = curAgent.getUncertainty();
 
-            if (curAgent.getVotingOpinion()) {  //Agent is on the blue team
-                //The agent is "certain", so their uncertainty increases and blue loses energy
-                if (curAgent.getUncertainty() < 0) {
-                    newUncertainty += mappedPotency;
-                    if (!byGreyAgent) {
-                        blueAgent.decrementEnergy(1);
-                        // todo energy loss
-                    }
-                }
-                //The agent is "uncertain", so their uncertainty decreases
-                else {
-                    newUncertainty -= mappedPotency;
-                    if (!byGreyAgent) {
-                        // todo energy (?)
-                    }
-                }
+            // If blue turn is not executed by grey agent and green agent is certain, decrease energy level
+            // Green agent is certain if uncertainty is less than 0
+            // The more certain an agent, the higher the energy loss
+            if (!byGreyAgent && curAgent.getUncertainty() < 0) {
+                double curUncertainty = -curAgent.getUncertainty(); 
+                double energyLoss =  curUncertainty * ENERGYSCALEFACTOR;
+                blueAgent.decrementEnergy(energyLoss);
             }
-            else {  //Agent is on the red team
-                //The agent is "certain", so their uncertainty decreases and blue loses energy
-                if (curAgent.getUncertainty() < 0) {
-                    if (!byGreyAgent) {
-                        blueAgent.decrementEnergy(1);
-                        // todo energy loss
-                    }
-                }
-                //The agent is "uncertain", so their uncertainty increases
-                else {
-                    newUncertainty += mappedPotency;
-                    if (!byGreyAgent) {
-                        // todo energy (?)
-                    }
-                }
+
+            //Green agent is on blue team (vote), so decrease uncertainty
+            if (curAgent.getVotingOpinion()) {  
+                newUncertainty -= mappedPotency;
+            }
+            //Green agent is on red team (not vote), so increase uncertainty
+            else {
+                newUncertainty += mappedPotency;
             }
             curAgent.setUncertainty(newUncertainty);
         }
@@ -430,11 +403,13 @@ public class Game {
     /**
      * Executes the blue turn option 2 to let a grey agent into the green network.
      */
-    public void executeBlueTurn2(int messagePotency) {
+    public void executeBlueTurn2() {
         Random indexGenerator = new Random();
         int greyAgentIndex = indexGenerator.nextInt(greyAgentCount);
         GreyAgent greyAgent = greyAgentsList[greyAgentIndex];
+        int messagePotency = greyAgent.chooseMessage();
         System.out.printf("\nGrey Agent %d chosen is from %s team.\n", greyAgentIndex, greyAgent.getBlueTeamStatus() ? "blue" : "red");
+
         //Grey Agent is on the blue team
         if (greyAgent.getBlueTeamStatus()) {
             executeBlueTurn1(messagePotency, true);
@@ -456,6 +431,12 @@ public class Game {
             throw new IllegalArgumentException("Error, the message potency must be within the range 0 to 5 inclusively.");
         }
 
+        /*
+         * If the potency is 3 or less, it has a negative effect (i.e. the opposite) of what is mentioned below.
+         * The smaller the number, the more negative the effect.
+         * If the potency is 4 or more, then it has the effect as stated below.
+         * The bigger the number, the greater the effect.  
+         */
         double mappedPotency = 0;
 
         //Map the message potency
@@ -557,7 +538,7 @@ public class Game {
      * Prints out the blue agent energy level status
      */
     public void printBlueEnergyLevel() {
-        System.out.println(String.format("Blue Agent energy level is at %d%%.", blueAgent.getEnergyLevel()));
+        System.out.println(String.format("Blue Agent energy level is at %.2f%%.", blueAgent.getEnergyLevel()));
     }
 
     /**

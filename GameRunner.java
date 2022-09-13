@@ -61,11 +61,11 @@ public class GameRunner {
             //Execute the blue turn
             System.out.println("\nBLUE AGENT'S TURN");
             int userBlueChoice = getBlueOption();
-            int bluePotency = getMessagePotency("blue");
             if (userBlueChoice == 1) {
+                int bluePotency = getMessagePotency("blue");
                 gameInstance.executeBlueTurn1(bluePotency, false);
             } else if (userBlueChoice == 2) {
-                gameInstance.executeBlueTurn2(bluePotency);
+                gameInstance.executeBlueTurn2();
             }
             
             //Execute the green turn
@@ -78,7 +78,8 @@ public class GameRunner {
             gameInstance.printBlueEnergyLevel();
             gameInstance.printRedFollowerCount();
             
-            triggerGameEnd = gameInstance.triggerGameEnd();  //NOT DONE - triggerGameEnd becomes true when blue energy level is depleted 
+            //Trigger game end is true if blue agent energy is depleted
+            triggerGameEnd = gameInstance.triggerGameEnd();
         }
         scanner.close();
         if (gameInstance.blueWins()) {
