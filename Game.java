@@ -354,13 +354,28 @@ public class Game {
             interactedGreens.add(greenIndex); 
             GreenAgent curAgent = greenAgentsList[greenIndex];
             double newUncertainty = curAgent.getUncertainty();
-            //Green agent is on blue team (vote), so increase uncertainty
-            if (curAgent.getVotingOpinion()) {  
-                newUncertainty += mappedPotency;
+            
+             //Agent is on the blue team
+             if (curAgent.getVotingOpinion()) {
+                //The agent is "certain", so their uncertainty decreases
+                if (curAgent.getUncertainty() < 0) {
+                    newUncertainty -= mappedPotency;
+                }
+                //The agent is "uncertain", so their uncertainty increases
+                else {
+                    newUncertainty += mappedPotency;
+                }
             }
-            //Green agent is on red team (not vote), so decrease uncertainty
+            //Agent is on the red team
             else {
-                newUncertainty -= mappedPotency;
+                //The agent is "certain", so their uncertainty increases
+                if (curAgent.getUncertainty() < 0) {
+                    newUncertainty += mappedPotency;
+                }
+                //The agent is "uncertain", so their uncertainty decreases
+                else {
+                    newUncertainty -= mappedPotency;
+                }
             }
             curAgent.setUncertainty(newUncertainty);
         }
@@ -381,20 +396,33 @@ public class Game {
 
             // If blue turn is not executed by grey agent and green agent is certain, decrease energy level
             // Green agent is certain if uncertainty is less than 0
-            // The more certain an agent, the higher the energy loss
+            // The more potent a message, the higher the energy loss
             if (!byGreyAgent && curAgent.getUncertainty() < 0) {
                 double curUncertainty = -curAgent.getUncertainty(); 
                 double energyLoss =  curUncertainty * ENERGYSCALEFACTOR;
                 blueAgent.decrementEnergy(energyLoss);
             }
 
-            //Green agent is on blue team (vote), so decrease uncertainty
+            //Agent is on the blue team
             if (curAgent.getVotingOpinion()) {  
-                newUncertainty -= mappedPotency;
+                //The agent is "certain", so their uncertainty increases and blue loses energy
+                if (curAgent.getUncertainty() < 0) {
+                    newUncertainty += mappedPotency;
+                }
+                //The agent is "uncertain", so their uncertainty decreases
+                else {
+                    newUncertainty -= mappedPotency;
+                }
             }
-            //Green agent is on red team (not vote), so increase uncertainty
-            else {
-                newUncertainty += mappedPotency;
+            //Agent is on the red team
+            else { 
+                //The agent is "certain", so their uncertainty decreases and blue loses energy
+                if (curAgent.getUncertainty() < 0) {
+                }
+                //The agent is "uncertain", so their uncertainty increases
+                else {
+                    newUncertainty += mappedPotency;
+                }
             }
             curAgent.setUncertainty(newUncertainty);
         }
@@ -418,7 +446,7 @@ public class Game {
         else {
             executeRedTurn(messagePotency, true);
         }
-    }
+    } 
 
     /**
      * Handles the error checking and calculation of the given message potency. 
@@ -568,7 +596,6 @@ public class Game {
                 greenNo++;
             }
         }
-        
         return (greenYes > greenNo);
     }
 }
