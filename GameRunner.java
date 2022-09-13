@@ -4,6 +4,7 @@ import java.util.Random;
 public class GameRunner {
 
     private Game gameInstance;
+    private final int maxIterations = 20;
     private final String[][] redMessages =  {   {"1 version 1", "1 version 2"},
                                                 {"2 version 1", "2 version 2"},
                                                 {"3 version 1", "3 version 2"},
@@ -46,13 +47,15 @@ public class GameRunner {
      * @return 0 on game end, anything else denotes an error.
      */
     public int playGame() {
-        
+        int numIterations = 0;
         gameInstance.printGreenAgents();
         gameInstance.printGreenStatistics();
         Scanner scanner = new Scanner(System.in);
         boolean triggerGameEnd = false;         //True when game end is triggered, false when game is running
 
         while (!triggerGameEnd) {
+            numIterations++;
+
             //Execute the red turn
             System.out.println("\nRED AGENT'S TURN");
             int redPotency = getMessagePotency("red");
@@ -80,8 +83,17 @@ public class GameRunner {
             
             //Trigger game end is true if blue agent energy is depleted
             triggerGameEnd = gameInstance.triggerGameEnd();
+            if (!triggerGameEnd) {
+                triggerGameEnd = (numIterations == maxIterations);
+            }
         }
         scanner.close();
+        if (gameInstance.triggerGameEnd()) {
+            System.out.println("Game is Over : Blue energy depleted.");
+        } 
+        else if (numIterations == maxIterations) {
+            System.out.println("Game is Over : Max iterations reached.");
+        }
         if (gameInstance.blueWins()) {
             System.out.println("Blue Agent wins!");
         } else {
@@ -208,6 +220,5 @@ public class GameRunner {
         double[] uncertaintyInterval = {-1.0, 0.4};
         GameRunner curRunner = new GameRunner(40, 0.4, 10, 40.0, uncertaintyInterval, 60.0);
         curRunner.playGame();
-        System.out.println("The game is over");
     }
 }
