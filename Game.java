@@ -251,7 +251,7 @@ public class Game {
                         secondOutput *= PULLUPSCALEFACTOR;
                     }
                 }
-
+                
                 //Update uncertainties at the end. This is done to keep the code simple.
                 //However, we can liken this to the agents going home and thinking about the conversation, and then changing their mindset so it is realistic.
                 firstAgent.setUncertainty(firstOutput);
@@ -596,4 +596,3 @@ public class Game {
         return (greenYes > greenNo);
     }
 }
-

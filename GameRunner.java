@@ -3,8 +3,12 @@ import java.util.Random;
 
 public class GameRunner {
 
-    private Game gameInstance;
-    private final int maxIterations = 20;
+    private Game gameInstance;              // Game
+    private RedAI redAI;                    // Red AI
+    private BlueAI blueAI;                  // Blue AI
+    private boolean playAsRedAI;            // True if Red AI is playing, false otherwise
+    private boolean playAsBlueAI;           // True if Blue AI is playing, false otherwise
+    private final int maxIterations = 20;   // Maximum number of game simulations
     private final String[][] redMessages =  {   {"1 version 1", "1 version 2"},
                                                 {"2 version 1", "2 version 2"},
                                                 {"3 version 1", "3 version 2"},
@@ -30,6 +34,8 @@ public class GameRunner {
     public GameRunner(int greenAgentCount, double probabilityOfConnection, int greyCount, double greyEvilProportion, double[] greenUncertaintyInterval, double greenVotePercent) {
         //There is no error checking because the Game constructor deals with this.
         gameInstance = new Game(greenAgentCount, probabilityOfConnection, greyCount, greyEvilProportion, greenUncertaintyInterval, greenVotePercent);
+        redAI = new RedAI();    //Creates red AI
+        blueAI = new BlueAI();  //Creates blue AI
     }
 
     /**
@@ -41,6 +47,35 @@ public class GameRunner {
     }
 
     /**
+     * Initialises whether the Red or Blue agent is played by a user or AI.
+     * @param agent Red or Blue agent
+     */
+    public void playAsUser(String agent) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.printf("%s Agent : playing as user or AI?\n", agent.substring(0,1).toUpperCase() + agent.substring(1).toLowerCase());
+        boolean playAsAI = false;
+        boolean correctInput = false;
+        
+        while (!correctInput) {
+            String userInput = scanner.nextLine();
+            if (userInput.equalsIgnoreCase("user")) {
+                correctInput = true;
+                playAsAI = false;
+            } else if (userInput.equalsIgnoreCase("ai")) {
+                correctInput = true;
+                playAsAI = true;
+            } else {
+                correctInput = false;
+                System.out.println("\nError, enter \'user\' or \'ai\'");
+            }
+        }
+        if (agent.equalsIgnoreCase("red")) {
+            playAsRedAI = playAsAI;
+        } else if (agent.equalsIgnoreCase("blue")) {
+            playAsBlueAI = playAsAI;
+        }
+    }
+    /**
      * A blocking function that executes the game, waiting for human inputs for the red turn. The red turn is executed before the green turn
      * Prints the game statistics after each turn.
      * The game ends once the player passes in the end game command.
@@ -51,25 +86,17 @@ public class GameRunner {
         gameInstance.printGreenAgents();
         gameInstance.printGreenStatistics();
         Scanner scanner = new Scanner(System.in);
-        boolean triggerGameEnd = false;         //True when game end is triggered, false when game is running
+        //True when game end is triggered, false when game is running
+        boolean triggerGameEnd = false;         
 
         while (!triggerGameEnd) {
             numIterations++;
 
             //Execute the red turn
-            System.out.println("\nRED AGENT'S TURN");
-            int redPotency = getMessagePotency("red");
-            gameInstance.executeRedTurn(redPotency, false);
+            playRedTurn();
 
             //Execute the blue turn
-            System.out.println("\nBLUE AGENT'S TURN");
-            int userBlueChoice = getBlueOption();
-            if (userBlueChoice == 1) {
-                int bluePotency = getMessagePotency("blue");
-                gameInstance.executeBlueTurn1(bluePotency, false);
-            } else if (userBlueChoice == 2) {
-                gameInstance.executeBlueTurn2();
-            }
+            playBlueTurn();
             
             //Execute the green turn
             System.out.println("\nGREEN TEAM");
@@ -100,6 +127,58 @@ public class GameRunner {
             System.out.println("Red Agent wins!");
         }
         return 0;
+    }
+
+    /**
+     * Executes the Red agent turn, depending on whether user or AI is playing.
+     */
+    public void playRedTurn() {
+        int redPotency;
+        System.out.println("\nRED AGENT'S TURN");
+
+        //If red AI is playing
+        if (playAsRedAI) {
+            redPotency = redAI.chooseMessagePotency();
+        }
+        //If user is playing
+        else {
+            redPotency = getMessagePotency("red");
+        }
+        System.out.printf("Red AI chose Potency %d.\n", redPotency);
+        gameInstance.executeRedTurn(redPotency, false);
+    }
+
+    /**
+     * Executes the Blue agent turn, depending on whether user or AI is playing.
+     */
+    public void playBlueTurn() {
+        int blueOption, bluePotency;
+        System.out.println("\nBLUE AGENT'S TURN");
+
+        //If blue AI is playing
+        if (playAsBlueAI) {
+            blueOption = blueAI.chooseBlueOption();
+        } 
+        //If user is playing
+        else {
+            blueOption = getBlueOption();
+        }
+
+        //If option 1 is chosen - interact with all green agents.
+        if (blueOption == 1) {
+            if (playAsBlueAI) {
+                bluePotency = blueAI.chooseMessagePotency();
+                System.out.printf("Blue AI chose Option %d and Potency %d.\n", blueOption, bluePotency);
+            } else {
+                bluePotency = getMessagePotency("blue");
+            }
+            gameInstance.executeBlueTurn1(bluePotency, false);
+        } 
+        //If option 2 is chosen - let grey agent into green network.
+        else if (blueOption == 2) {
+            System.out.printf("Blue AI chose Option %d.\n", blueOption);
+            gameInstance.executeBlueTurn2();
+        }
     }
 
     /**
@@ -219,6 +298,10 @@ public class GameRunner {
     public static void main(String[] args) {
         double[] uncertaintyInterval = {-1.0, 0.4};
         GameRunner curRunner = new GameRunner(40, 0.4, 10, 40.0, uncertaintyInterval, 60.0);
+        //Ask user if red agent is played by user or AI
+        curRunner.playAsUser("red");
+        //Ask user if blue agent is played by user or AI
+        curRunner.playAsUser("blue");
         curRunner.playGame();
     }
 }
