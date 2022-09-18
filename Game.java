@@ -23,7 +23,6 @@ public class Game {
     private final double FLIPLOWERBOUND = 0.4; //Lowerbound of the increase when flipping opinion
 
     private final int OPINIONSCALEFACTOR = 1000; //Used in calculations, the higher the value the greater accuracy
-    private final double OPINIONSETAFTERCHANGE = 0.6; //If an agents opinion changes, this is what their uncerainty becomes 
     
     private final double CHANGEPOSITIVETHRESHOLD = 0.05; //Threshold if uncerainty increases
     private final double CHANGENEGATIVETHRESHOLD  = 0.15; //Threshold if uncertainty decreases
