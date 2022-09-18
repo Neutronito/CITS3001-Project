@@ -28,7 +28,7 @@ public class Game {
     private final double CHANGEPOSITIVETHRESHOLD = 0.05; //Threshold if uncerainty increases
     private final double CHANGENEGATIVETHRESHOLD  = 0.15; //Threshold if uncertainty decreases
 
-    private final double PULLUPSCALEFACTOR = 1.2; //This is a factor mutliplied to the increase value (of the weaker node) when two nodes agree
+    private final double PULLUPSCALEFACTOR = 1.2; //This is a factor multiplied to the increase value (of the weaker node) when two nodes agree
     
     private final double[] POTENCYRANGE = {0.1, 0.4}; //This is the potency effect range of the map from the red and blue message potency
 
@@ -594,5 +594,14 @@ public class Game {
             }
         }
         return (greenYes > greenNo);
+    }
+
+    /**
+     * Getter for the list of all the green agents list
+     * WARNING, returns a shallow copy so use with care
+     * @return The array containing all the green agents
+     */
+    public GreenAgent[] getGreenAgentsList() {
+        return greenAgentsList;
     }
 }
