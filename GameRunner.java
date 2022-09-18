@@ -8,7 +8,7 @@ public class GameRunner {
     private BlueAI blueAI;                  // Blue AI
     private boolean playAsRedAI;            // True if Red AI is playing, false otherwise
     private boolean playAsBlueAI;           // True if Blue AI is playing, false otherwise
-    private final int maxIterations = 20;   // Maximum number of game simulations
+    private final int maxIterations = 40;   // Maximum number of game simulations
     private final String[][] redMessages =  {   {"1 version 1", "1 version 2"},
                                                 {"2 version 1", "2 version 2"},
                                                 {"3 version 1", "3 version 2"},
@@ -74,7 +74,6 @@ public class GameRunner {
         } else if (agent.equalsIgnoreCase("blue")) {
             playAsBlueAI = playAsAI;
         }
-        scanner.close();
     }
     /**
      * A blocking function that executes the game, waiting for human inputs for the red turn. The red turn is executed before the green turn
@@ -195,7 +194,6 @@ public class GameRunner {
             System.out.println("Option 2 : Let a Grey agent in the Green network.");
             userChoice = scanner.nextLine();
         }
-        scanner.close();
 
         int blueOption = Integer.parseInt(userChoice);
         return blueOption;
@@ -238,8 +236,6 @@ public class GameRunner {
             //Wait for an input from the user
             userInput = scanner.nextLine();
         }
-
-        scanner.close();
 
         int messagePotency = Integer.parseInt(userInput);
         return messagePotency;
