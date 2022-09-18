@@ -30,7 +30,8 @@ public class GreyAgent {
 
     public int chooseMessage() {
         Random levelGenerator = new Random();
-        int messagePotency = levelGenerator.nextInt(1, 7);
+        int messagePotency = levelGenerator.nextInt(6);
+        messagePotency += 1;
         return messagePotency;
     }
 }
