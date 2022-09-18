@@ -122,7 +122,7 @@ public class GameRunner {
         else if (numIterations == maxIterations) {
             System.out.println("Game is Over : Max iterations reached.");
         }
-        if (gameInstance.blueWins()) {
+        if (gameInstance.hasMoreCertainVoters()) {
             System.out.println("Blue Agent wins!");
         } else {
             System.out.println("Red Agent wins!");
@@ -158,7 +158,7 @@ public class GameRunner {
 
         //If blue AI is playing
         if (playAsBlueAI) {
-            blueOption = blueAI.chooseBlueOption();
+            blueOption = blueAI.chooseBlueOption(gameInstance.hasMoreCertainVoters(), gameInstance.getBlueEnergyLevel());
         } 
         //If user is playing
         else {

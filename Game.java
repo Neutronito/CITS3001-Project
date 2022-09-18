@@ -573,13 +573,11 @@ public class Game {
     }
 
     /**
-     * Returns true if blue agent wins when game ends.
-     * Blue agent wins when there is a higher number of green agents voting with uncertainty less than 0.
-     * Returns false if red agent wins when game ends.
-     * Red agent wins when there is a higher number of green agents not voting with uncertainty less than 0.
-     * @return True if blue agent wins when game ends, false if red agent wins when game ends.
+     * Returns true if there are more certain green agents with opinion 'vote'.
+     * Returns false if there are more certain green agents with opinion 'not vote'.
+     * @return True if there are more certain green agents with opinion 'vote', false if there are more certain green agents with opinion 'not vote'.
      */
-    public boolean blueWins() {
+    public boolean hasMoreCertainVoters() {
         int greenYes = 0;   //Number of green agents who ARE voting with uncertainty less than 0
         int greenNo = 0;    //Number of green agents who ARE NOT voting with uncertainty less than 0
         
@@ -602,5 +600,14 @@ public class Game {
      */
     public GreenAgent[] getGreenAgentsList() {
         return greenAgentsList;
+    }
+
+    /**
+     * Getter for the blue agent energy level
+     * WARNING, returns a shallow copy so use with care
+     * @return The blue energy level
+     */
+    public double getBlueEnergyLevel() {
+        return blueAgent.getEnergyLevel();
     }
 }

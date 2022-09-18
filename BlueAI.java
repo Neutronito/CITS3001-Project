@@ -10,7 +10,24 @@ public class BlueAI {
         messagePotency = 1;
     }
 
-    public int chooseBlueOption() {
+    public int chooseBlueOption(boolean hasMoreCertainVoters, double blueEnergyLevel) {
+        /*
+         *  Option 1 : Interact with Green team
+         *  - good when Blue AI has high energh level
+         *  - good when there are more certain green agents who are voting (uncertainty < 0)
+         *  to try end the game faster in favour of Blue Agent
+         * 
+         *  Option 2 : Let a Grey agent in the Green network
+         *  - good when Blue AI has low energh level
+         *  - good when there are more certain green agents who are NOT voting (uncertainty < 0)
+         * 
+         *  There are 4 scenarios
+         *  1. high energy and more certain voters
+         *  2. high energy and more certain non-voters
+         *  3. low energy and more certain voters
+         *  4. low energy and more certain non-voters
+         */
+
         return blueOption;
         //todo - dumbo
     }
