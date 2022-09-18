@@ -10,7 +10,7 @@ public class BlueAI {
         messagePotency = 1;
     }
 
-    public int chooseBlueOption(boolean hasMoreCertainVoters, double blueEnergyLevel) {
+    public int chooseBlueOption(boolean hasMoreCertainVoters, double blueEnergyLevel, double proportionCertainGreens) {
         /*
          *  Option 1 : Interact with Green team
          *  - good when Blue AI has high energh level
@@ -22,14 +22,54 @@ public class BlueAI {
          *  - good when there are more certain green agents who are NOT voting (uncertainty < 0)
          * 
          *  There are 4 scenarios
-         *  1. high energy and more certain voters
-         *  2. high energy and more certain non-voters
-         *  3. low energy and more certain voters
-         *  4. low energy and more certain non-voters
+         *  1. high energy and more certain voters (winning)    - option 1 is better (end game faster)
+         *  2. high energy and more certain non-voters (losing) - option 1 is better (choose more potent message)
+         *  3. low energy and more certain voters (winning)     - option 1 is better (end game faster)
+         *  4. low energy and more certain non-voters (losing)  - option 2 is better (better to risk grey agent than to lose)
          */
 
+        //Index 0 - probability of choosing option 1
+        //Index 1 - probability of choosing option 2
+        double[] optionProbability = {0.5, 0.5};
+        double changeInProbability;
+
+        //Regardless of energy level, blue is more likely to use option 1 when winning
+        if (hasMoreCertainVoters) {
+            changeInProbability = (double) proportionCertainGreens / 2.0;
+            optionProbability[0] += changeInProbability;    //Increase chance of option 1
+            optionProbability[1] -= changeInProbability;    //Decrease chance of option 2
+        }
+
+        if (!hasMoreCertainVoters && blueEnergyLevel < 50.0) {
+            changeInProbability = (double) (50 - blueEnergyLevel) / 2.0 / 100.0;
+            optionProbability[0] -= changeInProbability;    //Decrease chance of option 1
+            optionProbability[1] += changeInProbability;    //Increase chance of option 2
+        }
+
+        if (!hasMoreCertainVoters && blueEnergyLevel >= 50.0) {
+            changeInProbability = (double) (50 - blueEnergyLevel) / 2.0 / 100.0;
+            optionProbability[0] -= changeInProbability;    //Decrease chance of option 1
+            optionProbability[1] += changeInProbability;    //Increase chance of option 2
+
+        }
+
+        double optionGenerator = Math.random();
+
+        if (optionProbability[0] < optionProbability[1]) {
+            if (optionGenerator > optionProbability[0] && optionGenerator < 1.0) {
+                blueOption = 2;
+            } else {
+                blueOption = 1;
+            }
+        }
+        else {
+            if (optionGenerator > optionProbability[1] && optionGenerator < 1.0) {
+                blueOption = 1;
+            } else {
+                blueOption = 2;
+            }
+        }
         return blueOption;
-        //todo - dumbo
     }
 
     public int chooseMessagePotency(GreenAgent[] greenList) {

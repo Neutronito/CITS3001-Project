@@ -603,6 +603,22 @@ public class Game {
     }
 
     /**
+     * Returns the proportion of green agents with high certainty (low uncertainty)
+     * WARNING, returns a shallow copy so use with care
+     * @return The proportion of green agents with high certainty (low uncertainty)
+     */
+    public double getProportionCertain() {
+        int certainGreens = 0;
+        for (GreenAgent curAgent : greenAgentsList) {
+            if (curAgent.getUncertainty() < 0) {
+                certainGreens++;
+            }
+        }
+        double proportionCertainGreens = certainGreens / greenAgentCount;
+        return proportionCertainGreens;
+    }
+
+    /**
      * Getter for the blue agent energy level
      * WARNING, returns a shallow copy so use with care
      * @return The blue energy level

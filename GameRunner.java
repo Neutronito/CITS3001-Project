@@ -158,7 +158,7 @@ public class GameRunner {
 
         //If blue AI is playing
         if (playAsBlueAI) {
-            blueOption = blueAI.chooseBlueOption(gameInstance.hasMoreCertainVoters(), gameInstance.getBlueEnergyLevel());
+            blueOption = blueAI.chooseBlueOption(gameInstance.hasMoreCertainVoters(), gameInstance.getBlueEnergyLevel(), gameInstance.getProportionCertain());
         } 
         //If user is playing
         else {
