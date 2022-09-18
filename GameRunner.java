@@ -74,6 +74,7 @@ public class GameRunner {
         } else if (agent.equalsIgnoreCase("blue")) {
             playAsBlueAI = playAsAI;
         }
+        scanner.close();
     }
     /**
      * A blocking function that executes the game, waiting for human inputs for the red turn. The red turn is executed before the green turn
@@ -138,7 +139,7 @@ public class GameRunner {
 
         //If red AI is playing
         if (playAsRedAI) {
-            redPotency = redAI.chooseMessagePotency();
+            redPotency = redAI.chooseMessagePotency(gameInstance.getGreenAgentsList());
         }
         //If user is playing
         else {
@@ -194,6 +195,8 @@ public class GameRunner {
             System.out.println("Option 2 : Let a Grey agent in the Green network.");
             userChoice = scanner.nextLine();
         }
+        scanner.close();
+
         int blueOption = Integer.parseInt(userChoice);
         return blueOption;
     }
@@ -235,6 +238,8 @@ public class GameRunner {
             //Wait for an input from the user
             userInput = scanner.nextLine();
         }
+
+        scanner.close();
 
         int messagePotency = Integer.parseInt(userInput);
         return messagePotency;
