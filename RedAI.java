@@ -1,5 +1,7 @@
 public class RedAI {
 
+    private final double MINGROUPDIFFERENCE = 0.5; //This is the minimum difference between the two groups
+
     private int messagePotency;
     
     public RedAI() {
@@ -30,7 +32,7 @@ public class RedAI {
          * Red certain is index     2
          * Red uncertain is index   3
          */
-        int[] proportionFactor = new int[4];
+        double[] proportionFactor = new double[4];
 
         //Loop through and process all the green agents
         for (GreenAgent curAgent : greenList) {
@@ -53,13 +55,25 @@ public class RedAI {
             proportionFactor[i] /= greenCount;
         }
 
-        //Since we are targetting 
+        //Since the two extremeties of potency affect to areas together, we can group them
+        double groupedHighPotency = proportionFactor[1] + proportionFactor[3];
+        double groupedLowPotency = proportionFactor[0] + proportionFactor[2];
 
+        double difference = groupedHighPotency - groupedLowPotency;
 
+        //Low Potency Message Dominates
+        if (difference < -MINGROUPDIFFERENCE) {
+            messagePotency = 1;
+            return messagePotency;
+        } 
+        
+        //High Potency Message Dominates
+        else if (difference > MINGROUPDIFFERENCE) {
+            messagePotency = 6;
+            return messagePotency;
+        }
+        
         return messagePotency;
-        /*
-         * todo - hi, this currently returns 1 so needa make it choose the
-         * potency depending on the opinions and uncertainties of green agents
-         */
+       
     }
 }
