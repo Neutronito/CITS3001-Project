@@ -45,7 +45,7 @@ public class RedAI {
             double curUncertainty = curAgent.getUncertainty();
             if (curUncertainty < 0) {
                 indexToWrite--;
-                curUncertainty *= 1;
+                curUncertainty *= -1;
             }
             proportionFactor[indexToWrite] += curUncertainty;
         }

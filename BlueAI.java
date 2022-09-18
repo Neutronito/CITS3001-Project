@@ -45,14 +45,14 @@ public class BlueAI {
         for (GreenAgent curAgent : greenList) {
             int indexToWrite = 1;
             
-            if (!curAgent.getVotingOpinion()) { //Red
+            if (!curAgent.getVotingOpinion()) {
                 indexToWrite = 3;
             }
             
             double curUncertainty = curAgent.getUncertainty();
             if (curUncertainty < 0) {
                 indexToWrite--;
-                curUncertainty *= 1;
+                curUncertainty *= -1;
             }
             proportionFactor[indexToWrite] += curUncertainty;
         }
@@ -79,7 +79,7 @@ public class BlueAI {
             messagePotency = 6;
             return messagePotency;
         }
-        
+
         return messagePotency;
     }
 }
