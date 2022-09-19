@@ -414,6 +414,7 @@ public class Game {
             else { 
                 //The agent is "certain", so their uncertainty decreases and blue loses energy
                 if (curAgent.getUncertainty() < 0) {
+                    newUncertainty -= mappedPotency;
                 }
                 //The agent is "uncertain", so their uncertainty increases
                 else {
@@ -603,19 +604,31 @@ public class Game {
     }
 
     /**
-     * Returns the proportion of green agents with high certainty (low uncertainty)
+     * Returns the proportion of green agents with high certainty, 
+     * the proportion of certain green agents with opinion 'vote',
+     * the proportion of certain green agents with opinion 'not vote'.
      * WARNING, returns a shallow copy so use with care
-     * @return The proportion of green agents with high certainty (low uncertainty)
+     * @return The array containing proportion of certain grees, certain blues, and certain reds.
      */
-    public double getProportionCertain() {
-        int certainGreens = 0;
+    public double[] getProportionCertain() {
+        int certainGreens   = 0;
+        int certainBlues    = 0;
+        int certainReds     = 0;
         for (GreenAgent curAgent : greenAgentsList) {
             if (curAgent.getUncertainty() < 0) {
                 certainGreens++;
+                if (curAgent.getVotingOpinion()) {
+                    certainBlues++;
+                } else {
+                    certainReds++;
+                }
             }
         }
-        double proportionCertainGreens = certainGreens / greenAgentCount;
-        return proportionCertainGreens;
+        double proportionCertainGreens  = certainGreens / greenAgentCount;
+        double proportionCertainBlues   = certainBlues / greenAgentCount;
+        double proportionCertainReds    = certainReds / greenAgentCount;
+        double[] output = {proportionCertainGreens, proportionCertainBlues, proportionCertainReds};
+        return output;
     }
 
     /**

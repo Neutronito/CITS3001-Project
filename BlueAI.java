@@ -10,7 +10,7 @@ public class BlueAI {
         messagePotency = 1;
     }
 
-    public int chooseBlueOption(boolean hasMoreCertainVoters, double blueEnergyLevel, double proportionCertainGreens) {
+    public int chooseBlueOption(boolean hasMoreCertainVoters, double blueEnergyLevel, double[] proportionCertain) {
         /*
          *  Option 1 : Interact with Green team
          *  - good when Blue AI has high energh level
@@ -22,48 +22,83 @@ public class BlueAI {
          *  - good when there are more certain green agents who are NOT voting (uncertainty < 0)
          * 
          *  There are 4 scenarios
-         *  1. high energy and more certain voters (winning)    - option 1 is better (end game faster)
+         *  1. high energy and more certain voters (winning)    - option 2 is better (save energy)
          *  2. high energy and more certain non-voters (losing) - option 1 is better (choose more potent message)
          *  3. low energy and more certain voters (winning)     - option 1 is better (end game faster)
          *  4. low energy and more certain non-voters (losing)  - option 2 is better (better to risk grey agent than to lose)
+
+         *  The lower the energy level, the higher the chance of choosing option 2 (based on energy level)
+         *  Uncertain blue - option 1
+         *  Certain blue - option 2
+         *  Uncertain red - option 1
+         *  Certain red - option 2
          */
 
         //Index 0 - probability of choosing option 1
         //Index 1 - probability of choosing option 2
         double[] optionProbability = {0.5, 0.5};
+        int option1 = 0, option2 = 0;
         double changeInProbability;
-
-        //Regardless of energy level, blue is more likely to use option 1 when winning
-        if (hasMoreCertainVoters) {
-            changeInProbability = (double) proportionCertainGreens / 2.0;
-            optionProbability[0] += changeInProbability;    //Increase chance of option 1
-            optionProbability[1] -= changeInProbability;    //Decrease chance of option 2
+        double proportionCertainGreens  = proportionCertain[0];
+        double proportionCertainBlues   = proportionCertain[1];
+        double proportionUncertainGreens = 1.0 - proportionCertainGreens;
+        
+        //Higher the proportion of certain greens means lower chance of choosing option 1 (save energy)
+        if (proportionCertainGreens > 0.5) {
+            changeInProbability = (proportionCertainGreens - 0.5) / 2.0;    //Based on proportion of certain greens
+            optionProbability[option1] -= changeInProbability;              //Decrease chance of option 1
+            optionProbability[option2] += changeInProbability;              //Increase chance of option 2
+        } 
+        //Higher the proportion of uncertain greens means higher chance of choosing option 1 (save energy)
+        else {
+            changeInProbability = (proportionUncertainGreens - 0.5) / 2.0;  //Based on proportion of certain greens
+            optionProbability[option1] += changeInProbability;              //Increase chance of option 1
+            optionProbability[option2] -= changeInProbability;              //Decrease chance of option 2
+        }
+        
+        //Energy is low
+        if (blueEnergyLevel < 50.0) {
+            //Blue is winning and low energy, therefore higher chance of choosing option 1
+            if (hasMoreCertainVoters) {
+                changeInProbability = (proportionCertainBlues) / 2.0;       //Based on proportion of certain blues
+                optionProbability[option1] += changeInProbability;          //Increase chance of option 1
+                optionProbability[option2] -= changeInProbability;          //Decrease chance of option 2
+            } 
+             //Blue is losing and low energy, therefore higher chance of choosing option 2
+            else {
+                changeInProbability = (proportionCertainBlues) / 2.0;       //Based on proportion of certain blues
+                optionProbability[option1] -= changeInProbability;          //Decrease chance of option 1
+                optionProbability[option2] += changeInProbability;          //Increase chance of option 2
+            }
+        }
+        //Energy is high
+        else {
+            //Blue is winning and high energy, therefore higher chance of choosing option 2
+            if (hasMoreCertainVoters) {
+                changeInProbability = (proportionCertainBlues) / 2.0;       //Based on proportion of certain greens
+                optionProbability[option1] -= changeInProbability;          //Increase chance of option 1
+                optionProbability[option2] += changeInProbability;          //Decrease chance of option 2
+            } 
+             //Blue is losing and high energy, therefore higher chance of choosing option 1
+            else {
+                changeInProbability = (proportionCertainBlues) / 2.0;       //Based on proportion of certain greens
+                optionProbability[option1] += changeInProbability;          //Decrease chance of option 1
+                optionProbability[option2] -= changeInProbability;          //Increase chance of option 2
+            }
         }
 
-        if (!hasMoreCertainVoters && blueEnergyLevel < 50.0) {
-            changeInProbability = (double) (50 - blueEnergyLevel) / 2.0 / 100.0;
-            optionProbability[0] -= changeInProbability;    //Decrease chance of option 1
-            optionProbability[1] += changeInProbability;    //Increase chance of option 2
-        }
-
-        if (!hasMoreCertainVoters && blueEnergyLevel >= 50.0) {
-            changeInProbability = (double) (50 - blueEnergyLevel) / 2.0 / 100.0;
-            optionProbability[0] -= changeInProbability;    //Decrease chance of option 1
-            optionProbability[1] += changeInProbability;    //Increase chance of option 2
-
-        }
-
+        //Now choose blue option based on probability of being chosen
         double optionGenerator = Math.random();
 
-        if (optionProbability[0] < optionProbability[1]) {
-            if (optionGenerator > optionProbability[0] && optionGenerator < 1.0) {
+        if (optionProbability[option1] < optionProbability[option2]) {
+            if (optionGenerator > optionProbability[option1] && optionGenerator < 1.0) {
                 blueOption = 2;
             } else {
                 blueOption = 1;
             }
         }
         else {
-            if (optionGenerator > optionProbability[1] && optionGenerator < 1.0) {
+            if (optionGenerator > optionProbability[option2] && optionGenerator < 1.0) {
                 blueOption = 1;
             } else {
                 blueOption = 2;
@@ -72,7 +107,7 @@ public class BlueAI {
         return blueOption;
     }
 
-    public int chooseMessagePotency(GreenAgent[] greenList) {
+    public int chooseMessagePotency(GreenAgent[] greenList, double[] proportionCertain) {
          /*
          *  The general strategy of the Blue AI is as follows:
          * 
@@ -124,6 +159,18 @@ public class BlueAI {
         double groupedLowPotency = proportionFactor[0] + proportionFactor[2];
 
         double difference = groupedHighPotency - groupedLowPotency;
+
+        /*
+         * The higher the uncertain blue, higher message potency
+         * The higher the certain blue, lower message potency
+         * The higher the uncertain red, higher message potency
+         * The higher the certain red, lower message potency
+         */
+
+        // double proportionCertainBlues   = proportionCertain[1];
+        // double proportionUncertainBlues = 1.0 - proportionCertainBlues;
+        // double proportionCertainReds    = proportionCertain[2];
+        // double proportionUncertainReds  = 1.0 - proportionCertainReds;
 
         //Low Potency Message Dominates
         if (difference < -MINGROUPDIFFERENCE) {
