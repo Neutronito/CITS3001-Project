@@ -64,13 +64,28 @@ public class RedAI {
         //Low Potency Message Dominates
         if (difference < -MINGROUPDIFFERENCE) {
             messagePotency = 1;
-            return messagePotency;
         } 
         
         //High Potency Message Dominates
         else if (difference > MINGROUPDIFFERENCE) {
             messagePotency = 6;
-            return messagePotency;
+        }
+
+        //The potency is very close, so we should act in between extremities
+        else if (difference < 0) {
+            if (difference < -(MINGROUPDIFFERENCE / 2)) {
+                messagePotency = 2;
+            } else {
+                messagePotency = 3;
+            }
+        } 
+        //The difference must be between 0 and +Minimum group difference
+        else {
+            if (difference > (MINGROUPDIFFERENCE / 2)) {
+                messagePotency = 5;
+            } else {
+                messagePotency = 4;
+            }
         }
         
         return messagePotency;
