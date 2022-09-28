@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class GameRunner {
@@ -22,6 +23,13 @@ public class GameRunner {
                                                 {"5 version 1", "5 version 2"},
                                                 {"6 version 1", "6 version 2"}   };
 
+    private boolean askForGreenGraph;
+    private boolean showAverageUncertaintyPlot;
+
+    private ArrayList<Double> listOfAverageUncertainty;
+
+    
+
     /**
      * This creates the game instance, it takes a clone of the Game parameters to feed into the Game class it will create.
      * @param greenAgentCount The number of green nodes to exist in the nework
@@ -36,6 +44,14 @@ public class GameRunner {
         gameInstance = new Game(greenAgentCount, probabilityOfConnection, greyCount, greyEvilProportion, greenUncertaintyInterval, greenVotePercent);
         redAI = new RedAI();    //Creates red AI
         blueAI = new BlueAI();  //Creates blue AI
+        
+        askForGreenGraph = getOption("\nDo you wish to be asked after every round to see the green network graph? Please type in y for yes or n for no.");
+        showAverageUncertaintyPlot = getOption("\nDo you wish to see the line chart of the average uncertainty over time at the end of the game? Please type in y for yes or n for no.");
+
+        if (showAverageUncertaintyPlot) {
+            listOfAverageUncertainty = new ArrayList<>();
+        }
+        
     }
 
     /**
@@ -109,44 +125,25 @@ public class GameRunner {
             gameInstance.printRedFollowerCount();
 
             //Ask the user if they wish to see the graph
-            String userChoice = "blank";
-            boolean displayGraph = false;
-            
-            System.out.println("\nDo you wish to view the green agents bar graph? Type in y for yes or n for no");
+            if (askForGreenGraph) {
+                boolean displayGraph = getOption("\nDo you wish to view the green agents bar graph? Type in y for yes or n for no");
 
-            while (true) {
-                userChoice = scanner.nextLine();
-                
-                if (userChoice.length() != 1) {
-                    System.out.println("Error, your input was not understood. Please input either y or n.");
-                }
-
-                else if (userChoice.charAt(0) == 'y') {
-                    displayGraph = true;
-                    break;
-                }
-
-                else if (userChoice.charAt(0) == 'n') {
-                    displayGraph = false;
-                    break;
-                }
-
-                else {
-                    System.out.println("Error, your input was not understood. Please input either y or n.");
+                if (displayGraph) {
+                    ProcessBuilder processBuilder = new ProcessBuilder("python3", "./GreenGrapher.py", gameInstance.getFormattedGreenViews());
+                    processBuilder.redirectErrorStream(true);
+                    
+                    try {
+                        Process process = processBuilder.start();
+                        process.waitFor();
+                    } catch(Exception e) {
+                        System.out.println("Error, unable to launch the python script.");
+                        System.out.println(e);
+                    }
                 }
             }
 
-            if (displayGraph) {
-                ProcessBuilder processBuilder = new ProcessBuilder("python3", "./GreenGrapher.py", gameInstance.getFormattedGreenViews());
-                processBuilder.redirectErrorStream(true);
-                
-                try {
-                    Process process = processBuilder.start();
-                    int exitCode = process.waitFor();
-                } catch(Exception e) {
-                    System.out.println("Error, unable to launch the python script.");
-                    System.out.println(e);
-                }
+            if (showAverageUncertaintyPlot) {
+                listOfAverageUncertainty.add(gameInstance.getAverageUncertainty());
             }
             
             //Trigger game end is true if blue agent energy is depleted
@@ -336,6 +333,40 @@ public class GameRunner {
           return false;  
         }  
       }
+
+
+      /**
+       * Asks the user for input and returns true or false whether they put in y or n
+       * @param requestString The message to send the user before asking them to fill in the input
+       * @return true if y was input or false if n was input
+       */
+    public boolean getOption(String requestString) {
+        String userChoice = "blank";
+        
+        System.out.println(requestString);
+
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            userChoice = scanner.nextLine();
+            
+            if (userChoice.length() != 1) {
+                System.out.println("Error, your input was not understood. Please input either y or n.");
+            }
+
+            else if (userChoice.charAt(0) == 'y') {
+                return true;
+            }
+
+            else if (userChoice.charAt(0) == 'n') {
+                return false;
+            }
+
+            else {
+                System.out.println("Error, your input was not understood. Please input either y or n.");
+            }
+        }
+    }
 
     public static void main(String[] args) {
         double[] uncertaintyInterval = {-1.0, 0.4};
