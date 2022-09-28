@@ -677,5 +677,21 @@ public class Game {
         }
 
         return returnString.substring(0, returnString.length() - 1);
+    }  
+    
+    /**
+     * Getter for the average uncertainty of the entire newtork
+     * @return A double denoting the average uncertainty
+     */
+    public double getAverageUncertainty() {
+        double total = 0;
+
+        for (GreenAgent curAgent : greenAgentsList) {
+            total += curAgent.getUncertainty();    
+        }
+
+        total /= greenAgentCount;
+
+        return total;
     }
 }
