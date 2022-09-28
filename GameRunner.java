@@ -107,6 +107,47 @@ public class GameRunner {
             gameInstance.printGreenStatistics();
             gameInstance.printBlueEnergyLevel();
             gameInstance.printRedFollowerCount();
+
+            //Ask the user if they wish to see the graph
+            String userChoice = "blank";
+            boolean displayGraph = false;
+            
+            System.out.println("\nDo you wish to view the green agents bar graph? Type in y for yes or n for no");
+
+            while (true) {
+                userChoice = scanner.nextLine();
+                
+                if (userChoice.length() != 1) {
+                    System.out.println("Error, your input was not understood. Please input either y or n.");
+                }
+
+                else if (userChoice.charAt(0) == 'y') {
+                    displayGraph = true;
+                    break;
+                }
+
+                else if (userChoice.charAt(0) == 'n') {
+                    displayGraph = false;
+                    break;
+                }
+
+                else {
+                    System.out.println("Error, your input was not understood. Please input either y or n.");
+                }
+            }
+
+            if (displayGraph) {
+                ProcessBuilder processBuilder = new ProcessBuilder("python3", "./GreenGrapher.py");
+                processBuilder.redirectErrorStream(true);
+                
+                try {
+                    Process process = processBuilder.start();
+                    process.waitFor();
+                } catch(Exception e) {
+                    System.out.println("Error, unable to launch the python script.");
+                    System.out.println(e);
+                }
+            }
             
             //Trigger game end is true if blue agent energy is depleted
             triggerGameEnd = gameInstance.triggerGameEnd();
