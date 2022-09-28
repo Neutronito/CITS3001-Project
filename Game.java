@@ -639,4 +639,43 @@ public class Game {
     public double getBlueEnergyLevel() {
         return blueAgent.getEnergyLevel();
     }
+
+    /**
+     * Getter for green network as a formatted array
+     * Used for feeding into python script, rightmost digit is voting opinion, 1 being voting and 0 being not voting. The remaining digits represent a floored value of the uncertainty * 10, so -8.79879 would be -8
+     * @return An array but formatted as a string
+     */
+    public String getFormattedGreenViews() {
+        String returnString = "";
+
+        for (GreenAgent curAgent : greenAgentsList) {
+            
+            int votingOpinion = 0;
+            // Agent is voting
+            if (curAgent.getVotingOpinion()) {
+                votingOpinion = 1;
+            }
+
+            //Now process uncertainty
+            int flooredUncerainty = (int)Math.floor(curAgent.getUncertainty() * 10);
+
+            if (curAgent.getUncertainty() < 0) {
+                flooredUncerainty += 1;
+            }
+
+            flooredUncerainty *= 10;
+
+            if (flooredUncerainty < 0) {
+                flooredUncerainty -= votingOpinion;
+            } else {
+                flooredUncerainty += votingOpinion;
+            }
+
+           returnString += Integer.toString(flooredUncerainty);
+           returnString += ",";
+
+        }
+
+        return returnString.substring(0, returnString.length() - 1);
+    }
 }

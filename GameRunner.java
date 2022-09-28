@@ -137,12 +137,14 @@ public class GameRunner {
             }
 
             if (displayGraph) {
-                ProcessBuilder processBuilder = new ProcessBuilder("python3", "./GreenGrapher.py");
+                ProcessBuilder processBuilder = new ProcessBuilder("python3", "./GreenGrapher.py", gameInstance.getFormattedGreenViews());
+                System.out.println("GreenGrapher.py " + gameInstance.getFormattedGreenViews());
                 processBuilder.redirectErrorStream(true);
                 
                 try {
                     Process process = processBuilder.start();
-                    process.waitFor();
+                    int exitCode = process.waitFor();
+                    System.out.println(exitCode);
                 } catch(Exception e) {
                     System.out.println("Error, unable to launch the python script.");
                     System.out.println(e);
