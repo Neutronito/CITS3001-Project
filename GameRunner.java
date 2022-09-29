@@ -48,8 +48,10 @@ public class GameRunner {
         askForGreenGraph = getOption("\nDo you wish to be asked after every round to see the green network graph? Please type in y for yes or n for no.");
         showAverageUncertaintyPlot = getOption("\nDo you wish to see the line chart of the average uncertainty over time at the end of the game? Please type in y for yes or n for no.");
 
+        //init the array list and record the round 0 uncertainty
         if (showAverageUncertaintyPlot) {
             listOfAverageUncertainty = new ArrayList<>();
+            listOfAverageUncertainty.add(gameInstance.getAverageUncertainty());
         }
         
     }
@@ -152,7 +154,6 @@ public class GameRunner {
                 triggerGameEnd = (numIterations == maxIterations);
             }
         }
-        scanner.close();
         if (gameInstance.triggerGameEnd()) {
             System.out.println("Game is Over : Blue energy depleted.");
         } 
@@ -164,6 +165,37 @@ public class GameRunner {
         } else {
             System.out.println("Red Agent wins!");
         }
+        
+        //Print out the average uncertainty over time if it is required
+        if (showAverageUncertaintyPlot) {
+            boolean displayGraph = getOption("Would you like to see the graph of the green network average uncertainty over time? Type y for yes or n for no.");
+        
+            if (displayGraph) {
+                String paramString = "";
+
+                for (double curValue : listOfAverageUncertainty) {
+                    paramString += Double.toString(curValue);
+                    paramString += ",";
+                }
+
+                //cut of the last ,
+                paramString = paramString.substring(0, paramString.length() - 1);
+
+                ProcessBuilder processBuilder = new ProcessBuilder("python3", "./UncertaintyGrapher.py", paramString);
+                processBuilder.redirectErrorStream(true);
+                    
+                try {
+                    Process process = processBuilder.start();
+                    process.waitFor();
+                } catch(Exception e) {
+                    System.out.println("Error, unable to launch the python script.");
+                    System.out.println(e);
+                }
+            }
+        }
+
+        scanner.close();
+
         return 0;
     }
 
