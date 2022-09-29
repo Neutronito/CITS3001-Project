@@ -26,7 +26,8 @@ public class GameRunner {
     private boolean askForGreenGraph;
     private boolean showAverageUncertaintyPlot;
 
-    private ArrayList<Double> listOfAverageUncertainty;
+    private ArrayList<Double> listOfRedUncertainty;
+    private ArrayList<Double> listOfBlueUncertainty;
 
     
 
@@ -50,8 +51,11 @@ public class GameRunner {
 
         //init the array list and record the round 0 uncertainty
         if (showAverageUncertaintyPlot) {
-            listOfAverageUncertainty = new ArrayList<>();
-            listOfAverageUncertainty.add(gameInstance.getAverageUncertainty());
+            listOfRedUncertainty = new ArrayList<>();
+            listOfBlueUncertainty = new ArrayList<>();
+            
+            listOfRedUncertainty.add(gameInstance.getAverageUncertainty(false));
+            listOfBlueUncertainty.add(gameInstance.getAverageUncertainty(true));
         }
         
     }
@@ -145,7 +149,8 @@ public class GameRunner {
             }
 
             if (showAverageUncertaintyPlot) {
-                listOfAverageUncertainty.add(gameInstance.getAverageUncertainty());
+                listOfRedUncertainty.add(gameInstance.getAverageUncertainty(false));
+                listOfBlueUncertainty.add(gameInstance.getAverageUncertainty(true));
             }
             
             //Trigger game end is true if blue agent energy is depleted
@@ -173,7 +178,16 @@ public class GameRunner {
             if (displayGraph) {
                 String paramString = "";
 
-                for (double curValue : listOfAverageUncertainty) {
+                for (double curValue : listOfRedUncertainty) {
+                    paramString += Double.toString(curValue);
+                    paramString += ",";
+                }
+
+                //cut of the last , and add a |
+                paramString = paramString.substring(0, paramString.length() - 1);
+                paramString += "|";
+
+                for (double curValue : listOfBlueUncertainty) {
                     paramString += Double.toString(curValue);
                     paramString += ",";
                 }
