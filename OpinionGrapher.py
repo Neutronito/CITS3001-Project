@@ -6,7 +6,7 @@ import sys
 
 
 # process cmd line arguments
-# Syntax is: Each round is split by a | while inside the two numbers are split by a ,
+# Syntax is: Each round is split by a _ while inside the two numbers are split by a ,
 
 redCount = []
 blueCount = []
