@@ -681,16 +681,21 @@ public class Game {
     
     /**
      * Getter for the average uncertainty of the entire newtork
+     * @param votingOpinion The voting opinion of the group to obtain the uncertainty off
      * @return A double denoting the average uncertainty
      */
-    public double getAverageUncertainty() {
+    public double getAverageUncertainty(boolean votingOpinion) {
         double total = 0;
+        int count = 0;
 
         for (GreenAgent curAgent : greenAgentsList) {
-            total += curAgent.getUncertainty();    
+            if (curAgent.getVotingOpinion() == votingOpinion) {
+                total += curAgent.getUncertainty();
+                count++;    
+            }
         }
 
-        total /= greenAgentCount;
+        total /= (double)count;
 
         return total;
     }
