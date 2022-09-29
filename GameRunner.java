@@ -227,6 +227,39 @@ public class GameRunner {
             }
         }
 
+        //Print out the voting count over time if required
+        if (showOpinionsPerRound) {
+            boolean displayGraph = getOption("Would you like to see the graph of the green voting opinion over time? Type y for yes or n for no.");
+        
+            if (displayGraph) {
+                String paramString = "";
+
+                int length = votingForRedList.size();
+
+                for (int i = 0; i < length; i++) {
+                    paramString += votingForRedList.get(i);
+                    paramString += ",";
+                    paramString += votingForBlueList.get(i);
+                    paramString += "_";
+                }
+
+                
+                //cut of the last ,
+                paramString = paramString.substring(0, paramString.length() - 1);
+
+                ProcessBuilder processBuilder = new ProcessBuilder("python3", "./OpinionGrapher.py", paramString);
+                processBuilder.redirectErrorStream(true);
+                    
+                try {
+                    Process process = processBuilder.start();
+                    process.waitFor();
+                } catch(Exception e) {
+                    System.out.println("Error, unable to launch the python script.");
+                    System.out.println(e);
+                }
+            }
+        }
+
         scanner.close();
 
         return 0;
