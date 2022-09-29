@@ -699,4 +699,25 @@ public class Game {
 
         return total;
     }
+
+    /**
+     * Getter for the current voting opinions of the green network in the game
+     * @param redList pushes the current amount voting for red onto this list
+     * @param blueList pushes the current amount voting for blue onto this list
+     */
+    public void getVotingOpinions(ArrayList<Integer> redList, ArrayList<Integer> blueList) {
+        int redTotal = 0;
+        int blueTotal = 0;
+
+        for (GreenAgent curAgent : greenAgentsList) {
+            if (curAgent.getVotingOpinion()) {
+                blueTotal++;
+            } else {
+                redTotal++;
+            }
+        }
+
+        redList.add(redTotal);
+        blueList.add(blueTotal);
+    }
 }
