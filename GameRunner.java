@@ -25,6 +25,10 @@ public class GameRunner {
 
     private boolean askForGreenGraph;
     private boolean showAverageUncertaintyPlot;
+    private boolean showOpinionsPerRound;
+
+    private ArrayList<Integer> votingForRedList;
+    private ArrayList<Integer> votingForBlueList;
 
     private ArrayList<Double> listOfRedUncertainty;
     private ArrayList<Double> listOfBlueUncertainty;
@@ -48,6 +52,15 @@ public class GameRunner {
         
         askForGreenGraph = getOption("\nDo you wish to be asked after every round to see the green network graph? Please type in y for yes or n for no.");
         showAverageUncertaintyPlot = getOption("\nDo you wish to see the line chart of the average uncertainty over time at the end of the game? Please type in y for yes or n for no.");
+        showOpinionsPerRound = getOption("\nDo you wish to see a graph of the voting opinions per round at the end of the game? Please type in y for yes or n for no.");
+
+        //init the arraylist and record the numbers currently voting
+        if (showOpinionsPerRound) {
+            votingForRedList = new ArrayList<>();
+            votingForBlueList = new ArrayList<>();
+
+            gameInstance.getVotingOpinions(votingForRedList, votingForBlueList);
+        }
 
         //init the array list and record the round 0 uncertainty
         if (showAverageUncertaintyPlot) {
@@ -148,9 +161,15 @@ public class GameRunner {
                 }
             }
 
+            //update the average uncertainty storage
             if (showAverageUncertaintyPlot) {
                 listOfRedUncertainty.add(gameInstance.getAverageUncertainty(false));
                 listOfBlueUncertainty.add(gameInstance.getAverageUncertainty(true));
+            }
+
+            //update the voting opinion storage
+            if (showOpinionsPerRound) {
+                gameInstance.getVotingOpinions(votingForRedList, votingForBlueList);
             }
             
             //Trigger game end is true if blue agent energy is depleted
