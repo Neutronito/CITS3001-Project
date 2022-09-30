@@ -50,9 +50,9 @@ public class GameRunner {
         redAI = new RedAI();    //Creates red AI
         blueAI = new BlueAI();  //Creates blue AI
         
-        askForGreenGraph = getOption("\nDo you wish to be asked after every round to see the green network graph? Please type in y for yes or n for no.");
-        showAverageUncertaintyPlot = getOption("\nDo you wish to see the line chart of the average uncertainty over time at the end of the game? Please type in y for yes or n for no.");
-        showOpinionsPerRound = getOption("\nDo you wish to see a graph of the voting opinions per round at the end of the game? Please type in y for yes or n for no.");
+        askForGreenGraph = getOption("\nDo you wish to be asked after every round to see the green network graph?\nPlease type in y for yes or n for no.");
+        showAverageUncertaintyPlot = getOption("\nDo you wish to see the line chart of the average uncertainty over time at the end of the game?\nPlease type in y for yes or n for no.");
+        showOpinionsPerRound = getOption("\nDo you wish to see a graph of the voting opinions per round at the end of the game?\nPlease type in y for yes or n for no.");
 
         //init the arraylist and record the numbers currently voting
         if (showOpinionsPerRound) {
@@ -70,7 +70,6 @@ public class GameRunner {
             listOfRedUncertainty.add(gameInstance.getAverageUncertainty(false));
             listOfBlueUncertainty.add(gameInstance.getAverageUncertainty(true));
         }
-        
     }
 
     /**
@@ -87,7 +86,7 @@ public class GameRunner {
      */
     public void playAsUser(String agent) {
         Scanner scanner = new Scanner(System.in);
-        System.out.printf("%s Agent : playing as user or AI?\n", agent.substring(0,1).toUpperCase() + agent.substring(1).toLowerCase());
+        System.out.printf("\n%s Agent : playing as user or AI?\n", agent.substring(0,1).toUpperCase() + agent.substring(1).toLowerCase());
         boolean playAsAI = false;
         boolean correctInput = false;
         
@@ -145,7 +144,7 @@ public class GameRunner {
 
             //Ask the user if they wish to see the graph
             if (askForGreenGraph) {
-                boolean displayGraph = getOption("\nDo you wish to view the green agents bar graph? Type in y for yes or n for no");
+                boolean displayGraph = getOption("\nDo you wish to view the green agents bar graph?\nType in y for yes or n for no");
 
                 if (displayGraph) {
                     ProcessBuilder processBuilder = new ProcessBuilder("python3", "./GreenGrapher.py", gameInstance.getFormattedGreenViews());
