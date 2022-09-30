@@ -2,8 +2,6 @@ from ast import arg
 import numpy as np 
 import matplotlib.pyplot as plt 
 import sys
-  
-
 
 # process cmd line arguments
 # Syntax is: Each round is split by a _ while inside the two numbers are split by a ,
@@ -20,8 +18,6 @@ for argument in argumentsList:
     print("Second value is " + values[1])
     redCount.append(int(values[0]))
     blueCount.append(int(values[1]))
-
-
 
 print(redCount)
 print(blueCount)

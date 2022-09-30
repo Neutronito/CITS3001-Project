@@ -33,8 +33,6 @@ public class GameRunner {
     private ArrayList<Double> listOfRedUncertainty;
     private ArrayList<Double> listOfBlueUncertainty;
 
-    
-
     /**
      * This creates the game instance, it takes a clone of the Game parameters to feed into the Game class it will create.
      * @param greenAgentCount The number of green nodes to exist in the nework
@@ -171,7 +169,7 @@ public class GameRunner {
                 gameInstance.getVotingOpinions(votingForRedList, votingForBlueList);
             }
             
-            //Trigger game end is true if blue agent energy is depleted
+            //Trigger game end is true if blue agent energy is depleted or max iterations reached
             triggerGameEnd = gameInstance.triggerGameEnd();
             if (!triggerGameEnd) {
                 triggerGameEnd = (numIterations == maxIterations);
@@ -191,7 +189,7 @@ public class GameRunner {
         
         //Print out the average uncertainty over time if it is required
         if (showAverageUncertaintyPlot) {
-            boolean displayGraph = getOption("Would you like to see the graph of the green network average uncertainty over time? Type y for yes or n for no.");
+            boolean displayGraph = getOption("Would you like to see the graph of the green network average uncertainty over time?\nType y for yes or n for no.");
         
             if (displayGraph) {
                 String paramString = "";
@@ -212,10 +210,9 @@ public class GameRunner {
 
                 //cut of the last ,
                 paramString = paramString.substring(0, paramString.length() - 1);
-
+                
                 ProcessBuilder processBuilder = new ProcessBuilder("python3", "./graphs/UncertaintyGrapher.py", paramString);
                 processBuilder.redirectErrorStream(true);
-                    
                 try {
                     Process process = processBuilder.start();
                     process.waitFor();
@@ -228,7 +225,7 @@ public class GameRunner {
 
         //Print out the voting count over time if required
         if (showOpinionsPerRound) {
-            boolean displayGraph = getOption("Would you like to see the graph of the green voting opinion over time? Type y for yes or n for no.");
+            boolean displayGraph = getOption("Would you like to see the graph of the green voting opinion over time?\nType y for yes or n for no.");
         
             if (displayGraph) {
                 String paramString = "";
@@ -242,7 +239,6 @@ public class GameRunner {
                     paramString += "_";
                 }
 
-                
                 //cut of the last ,
                 paramString = paramString.substring(0, paramString.length() - 1);
 
@@ -430,7 +426,6 @@ public class GameRunner {
           return false;  
         }  
       }
-
 
       /**
        * Asks the user for input and returns true or false whether they put in y or n
