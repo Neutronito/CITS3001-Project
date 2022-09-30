@@ -181,8 +181,13 @@ public class GameRunner {
         else if (numIterations == maxIterations) {
             System.out.println("Game is Over : Max iterations reached.");
         }
-        if (gameInstance.hasMoreCertainVoters()) {
+
+        int greenYes = gameInstance.getCertainVotersCount()[0];
+        int greenNo  = gameInstance.getCertainVotersCount()[1];
+        if (greenYes > greenNo) {
             System.out.println("Blue Agent wins!");
+        } else if (greenYes == greenNo) {
+            System.out.println("Red and Blue Agent tied!");
         } else {
             System.out.println("Red Agent wins!");
         }
