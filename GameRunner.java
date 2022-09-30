@@ -56,7 +56,7 @@ public class GameRunner {
             votingForBlueList = new ArrayList<>();
             gameInstance.getVotingOpinions(votingForRedList, votingForBlueList);
         
-            //init the array list and record the round 0 uncertainty
+            //init the arraylist and record the round 0 uncertainty
             listOfRedUncertainty = new ArrayList<>();
             listOfBlueUncertainty = new ArrayList<>();
             listOfRedUncertainty.add(gameInstance.getAverageUncertainty(false));
@@ -387,6 +387,9 @@ public class GameRunner {
         }
     }
 
+    /**
+     * Displays the graphs for Opinion Over Time and Uncertainty Over Time for green agents.
+     */
     public void displayEndGraphs() {
         //Get the paramString for Opinion Over Time
         String opinionParam = "";
