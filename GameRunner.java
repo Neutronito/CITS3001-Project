@@ -147,7 +147,7 @@ public class GameRunner {
                 boolean displayGraph = getOption("\nDo you wish to view the green agents bar graph?\nType in y for yes or n for no");
 
                 if (displayGraph) {
-                    ProcessBuilder processBuilder = new ProcessBuilder("python3", "./GreenGrapher.py", gameInstance.getFormattedGreenViews());
+                    ProcessBuilder processBuilder = new ProcessBuilder("python3", "./graphs/GreenGrapher.py", gameInstance.getFormattedGreenViews());
                     processBuilder.redirectErrorStream(true);
                     
                     try {
@@ -213,7 +213,7 @@ public class GameRunner {
                 //cut of the last ,
                 paramString = paramString.substring(0, paramString.length() - 1);
 
-                ProcessBuilder processBuilder = new ProcessBuilder("python3", "./UncertaintyGrapher.py", paramString);
+                ProcessBuilder processBuilder = new ProcessBuilder("python3", "./graphs/UncertaintyGrapher.py", paramString);
                 processBuilder.redirectErrorStream(true);
                     
                 try {
@@ -246,7 +246,7 @@ public class GameRunner {
                 //cut of the last ,
                 paramString = paramString.substring(0, paramString.length() - 1);
 
-                ProcessBuilder processBuilder = new ProcessBuilder("python3", "./OpinionGrapher.py", paramString);
+                ProcessBuilder processBuilder = new ProcessBuilder("python3", "./graphs/OpinionGrapher.py", paramString);
                 processBuilder.redirectErrorStream(true);
                     
                 try {
