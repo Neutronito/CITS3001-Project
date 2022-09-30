@@ -594,6 +594,27 @@ public class Game {
     }
 
     /**
+     * Returns true if there are more certain green agents with opinion 'vote'.
+     * Returns false if there are more certain green agents with opinion 'not vote'.
+     * @return True if there are more certain green agents with opinion 'vote', false if there are more certain green agents with opinion 'not vote'.
+     */
+    public boolean hasMoreCertainVoters() {
+        int greenYes = 0;   //Number of green agents who ARE voting with uncertainty less than 0
+        int greenNo = 0;    //Number of green agents who ARE NOT voting with uncertainty less than 0
+        
+        for (int i = 0; i < greenAgentCount; i++) {
+            //Increment the voting counter
+            if (greenAgentsList[i].getVotingOpinion() && greenAgentsList[i].getUncertainty() < 0) {
+                greenYes++;
+            }
+            if (!greenAgentsList[i].getVotingOpinion() && greenAgentsList[i].getUncertainty() < 0) {
+                greenNo++;
+            }
+        }
+        return (greenYes > greenNo);
+    }
+
+    /**
      * Getter for the list of all the green agents list
      * WARNING, returns a shallow copy so use with care
      * @return The array containing all the green agents
