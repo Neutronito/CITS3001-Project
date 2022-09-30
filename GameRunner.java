@@ -23,9 +23,8 @@ public class GameRunner {
                                                 {"5 version 1", "5 version 2"},
                                                 {"6 version 1", "6 version 2"}   };
 
-    private boolean askForGreenGraph;
-    private boolean showAverageUncertaintyPlot;
-    private boolean showOpinionsPerRound;
+    private boolean displayGreenGraph;
+    private boolean displayEndGraphs;
 
     private ArrayList<Integer> votingForRedList;
     private ArrayList<Integer> votingForBlueList;
@@ -48,23 +47,18 @@ public class GameRunner {
         redAI = new RedAI();    //Creates red AI
         blueAI = new BlueAI();  //Creates blue AI
         
-        askForGreenGraph = getOption("\nDo you wish to be asked after every round to see the green network graph?\nPlease type in y for yes or n for no.");
-        showAverageUncertaintyPlot = getOption("\nDo you wish to see the line chart of the average uncertainty over time at the end of the game?\nPlease type in y for yes or n for no.");
-        showOpinionsPerRound = getOption("\nDo you wish to see a graph of the voting opinions per round at the end of the game?\nPlease type in y for yes or n for no.");
+        displayGreenGraph = getOption("\nDo you wish to see the green network graph for each round?\nPlease type in y for yes or n for no.");
+        displayEndGraphs = getOption("\nDo you wish to see the graph of voting opinions and average uncertainty over time at the end of the game?\nPlease type in y for yes or n for no.");
 
-        //init the arraylist and record the numbers currently voting
-        if (showOpinionsPerRound) {
+        if (displayEndGraphs) {
+            //init the arraylist and record the numbers currently voting
             votingForRedList = new ArrayList<>();
             votingForBlueList = new ArrayList<>();
-
             gameInstance.getVotingOpinions(votingForRedList, votingForBlueList);
-        }
-
-        //init the array list and record the round 0 uncertainty
-        if (showAverageUncertaintyPlot) {
+        
+            //init the array list and record the round 0 uncertainty
             listOfRedUncertainty = new ArrayList<>();
             listOfBlueUncertainty = new ArrayList<>();
-            
             listOfRedUncertainty.add(gameInstance.getAverageUncertainty(false));
             listOfBlueUncertainty.add(gameInstance.getAverageUncertainty(true));
         }
@@ -141,31 +135,25 @@ public class GameRunner {
             gameInstance.printRedFollowerCount();
 
             //Ask the user if they wish to see the graph
-            if (askForGreenGraph) {
-                boolean displayGraph = getOption("\nDo you wish to view the green agents bar graph?\nType in y for yes or n for no");
-
-                if (displayGraph) {
-                    ProcessBuilder processBuilder = new ProcessBuilder("python3", "./graphs/GreenGrapher.py", gameInstance.getFormattedGreenViews());
-                    processBuilder.redirectErrorStream(true);
-                    
-                    try {
-                        Process process = processBuilder.start();
-                        process.waitFor();
-                    } catch(Exception e) {
-                        System.out.println("Error, unable to launch the python script.");
-                        System.out.println(e);
-                    }
+            if (displayGreenGraph) {
+                ProcessBuilder processBuilder = new ProcessBuilder("python", "./graphs/GreenGrapher.py", gameInstance.getFormattedGreenViews());
+                processBuilder.redirectErrorStream(true);
+                
+                try {
+                    Process process = processBuilder.start();
+                    process.waitFor();
+                } catch(Exception e) {
+                    System.out.println("\nError, unable to launch the python script.");
+                    System.out.println(e);
                 }
             }
 
-            //update the average uncertainty storage
-            if (showAverageUncertaintyPlot) {
+            if (displayEndGraphs) {
+                //update the average uncertainty storage
                 listOfRedUncertainty.add(gameInstance.getAverageUncertainty(false));
                 listOfBlueUncertainty.add(gameInstance.getAverageUncertainty(true));
-            }
-
-            //update the voting opinion storage
-            if (showOpinionsPerRound) {
+            
+                //update the voting opinion storage
                 gameInstance.getVotingOpinions(votingForRedList, votingForBlueList);
             }
             
@@ -191,77 +179,9 @@ public class GameRunner {
         } else {
             System.out.println("Red Agent wins!");
         }
-        
-        //Print out the average uncertainty over time if it is required
-        if (showAverageUncertaintyPlot) {
-            boolean displayGraph = getOption("Would you like to see the graph of the green network average uncertainty over time?\nType y for yes or n for no.");
-        
-            if (displayGraph) {
-                String paramString = "";
 
-                for (double curValue : listOfRedUncertainty) {
-                    paramString += Double.toString(curValue);
-                    paramString += ",";
-                }
-
-                //cut of the last , and add a |
-                paramString = paramString.substring(0, paramString.length() - 1);
-                paramString += "|";
-
-                for (double curValue : listOfBlueUncertainty) {
-                    paramString += Double.toString(curValue);
-                    paramString += ",";
-                }
-
-                //cut of the last ,
-                paramString = paramString.substring(0, paramString.length() - 1);
-                
-                ProcessBuilder processBuilder = new ProcessBuilder("python3", "./graphs/UncertaintyGrapher.py", paramString);
-                processBuilder.redirectErrorStream(true);
-                try {
-                    Process process = processBuilder.start();
-                    process.waitFor();
-                } catch(Exception e) {
-                    System.out.println("Error, unable to launch the python script.");
-                    System.out.println(e);
-                }
-            }
-        }
-
-        //Print out the voting count over time if required
-        if (showOpinionsPerRound) {
-            boolean displayGraph = getOption("Would you like to see the graph of the green voting opinion over time?\nType y for yes or n for no.");
-        
-            if (displayGraph) {
-                String paramString = "";
-
-                int length = votingForRedList.size();
-
-                for (int i = 0; i < length; i++) {
-                    paramString += votingForRedList.get(i);
-                    paramString += ",";
-                    paramString += votingForBlueList.get(i);
-                    paramString += "_";
-                }
-
-                //cut of the last ,
-                paramString = paramString.substring(0, paramString.length() - 1);
-                
-                ProcessBuilder processBuilder = new ProcessBuilder("python3", "./graphs/OpinionGrapher.py", paramString);
-                processBuilder.redirectErrorStream(true);
-                    
-                try {
-                    Process process = processBuilder.start();
-                    process.waitFor();
-                } catch(Exception e) {
-                    System.out.println("Error, unable to launch the python script.");
-                    System.out.println(e);
-                }
-            }
-        }
-
+        displayEndGraphs();
         scanner.close();
-
         return 0;
     }
 
@@ -448,7 +368,7 @@ public class GameRunner {
             userChoice = scanner.nextLine();
             
             if (userChoice.length() != 1) {
-                System.out.println("Error, your input was not understood. Please input either y or n.");
+                System.out.println("\nError, your input was not understood. Please input either y or n.");
             }
 
             else if (userChoice.charAt(0) == 'y') {
@@ -460,9 +380,55 @@ public class GameRunner {
             }
 
             else {
-                System.out.println("Error, your input was not understood. Please input either y or n.");
+                System.out.println("\nError, your input was not understood. Please input either y or n.");
             }
         }
+    }
+
+    public void displayEndGraphs() {
+        //Get the paramString for Opinion Over Time
+        String opinionParam = "";
+        int length = votingForRedList.size();
+
+        for (int i = 0; i < length; i++) {
+            opinionParam += votingForRedList.get(i);
+            opinionParam += ",";
+            opinionParam += votingForBlueList.get(i);
+            opinionParam += "_";
+        }
+
+        //cut of the last ,
+        opinionParam = opinionParam.substring(0, opinionParam.length() - 1);
+
+        //Get the paramString for Uncertainty Over Time
+        String uncertaintyParam = "";
+        for (double curValue : listOfRedUncertainty) {
+            uncertaintyParam += Double.toString(curValue);
+            uncertaintyParam += ",";
+        }
+
+        //cut of the last , and add a |
+        uncertaintyParam = uncertaintyParam.substring(0, uncertaintyParam.length() - 1);
+        uncertaintyParam += "|";
+
+        for (double curValue : listOfBlueUncertainty) {
+            uncertaintyParam += Double.toString(curValue);
+            uncertaintyParam += ",";
+        }
+        
+        //cut of the last ,
+        uncertaintyParam = uncertaintyParam.substring(0, uncertaintyParam.length() - 1);
+
+        //Print Opinion over time and Uncertainty over time Graphs
+        ProcessBuilder processBuilder = new ProcessBuilder("python", "./graphs/endGrapher.py", opinionParam, uncertaintyParam);
+        processBuilder.redirectErrorStream(true);
+        try {
+            Process process = processBuilder.start();
+            process.waitFor();
+        } catch(Exception e) {
+            System.out.println("Error, unable to launch the python script.");
+            System.out.println(e);
+        }  
     }
 
     public static void main(String[] args) {
