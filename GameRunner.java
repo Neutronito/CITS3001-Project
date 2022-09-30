@@ -180,7 +180,9 @@ public class GameRunner {
             System.out.println("Red Agent wins!");
         }
 
-        displayEndGraphs();
+        if (displayEndGraphs) {
+            displayEndGraphs();
+        }
         scanner.close();
         return 0;
     }

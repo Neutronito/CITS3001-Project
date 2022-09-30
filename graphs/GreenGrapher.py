@@ -2,7 +2,14 @@ from ast import arg
 import numpy as np 
 import matplotlib.pyplot as plt 
 import sys
-  
+
+# Create the graph for Uncertainty Over Time
+# process cmd line arguments
+# Syntax is:
+# rightmost digit represents voting or not voting, 1 is voting, 0 is not voting
+# following digits represent uncertainty * 10, must be integers
+# so -0.896475 would be -8
+
 X = range(-10, 11, 1)
 for number in X:
     number /= 10
@@ -13,11 +20,6 @@ agents_voting = [0 for i in range(21)]
 agents_not_voting = []
 agents_not_voting = [0 for i in range(21)]
 
-# process cmd line arguments
-# Syntax is:
-# rightmost digit represents voting or not voting, 1 is voting, 0 is not voting
-# following digits represent uncertainty * 10, must be integers
-# so -0.896475 would be -8
 argumentsList = sys.argv[1].split(",")
 
 for argument in argumentsList:
