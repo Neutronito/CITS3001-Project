@@ -14,7 +14,7 @@ fromNodesList   = argumentsList[0].split(",")
 toNodesList     = argumentsList[1].split(",")
 
 teamsList       = sys.argv[2].split("|")
-greenAgents     = [x for x in teamsList[0]]
+greenAgents     = teamsList[0].split(",")
 greenTeams      = [x for x in teamsList[1]]
 
 # Build dataframe with connections
@@ -32,11 +32,11 @@ colors = colors.reindex(G.nodes())
 colors['team']=pd.Categorical(colors['team'])
 colors['team'].cat.codes
 
-nx.draw(G, with_labels=True, node_color=colors['team'].cat.codes, node_size=200, alpha=1, linewidths=20)
+nx.draw(G, with_labels=True, node_color=colors['team'].cat.codes, node_size=200, alpha=1, linewidths=5)
 plt.title("Green Agents Network", fontsize=14)
 # GREEN NETWORK -------------------------------------------------
 
-# GREY NETWORK -------------------------------------------------
+# GREY NETWORK --------------------------------------------------
 plt.subplot(1, 2, 2)
 
 greyTeams   = sys.argv[3]
@@ -46,8 +46,8 @@ G = nx.Graph()
 G.add_nodes_from(greyAgents)
 colors = ["red" if x == "0" else "blue" for x in greyTeams]
 
-nx.draw(G, with_labels=True, node_color=colors, node_size=200, alpha=1)
+nx.draw(G, with_labels=True, node_color=colors, node_size=200, alpha=1, linewidths=10)
 plt.title("Grey Agents Network", fontsize=14)
-# GREY NETWORK -------------------------------------------------
+# GREY NETWORK --------------------------------------------------
 
 plt.show()
