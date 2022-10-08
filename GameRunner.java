@@ -111,6 +111,7 @@ public class GameRunner {
         int numIterations = 0;
         gameInstance.printGreenAgents();
         gameInstance.printGreenStatistics();
+        displayGreenNetwork();
         Scanner scanner = new Scanner(System.in);
         //True when game end is triggered, false when game is running
         boolean triggerGameEnd = false;         
@@ -468,9 +469,6 @@ public class GameRunner {
             greenAgent += Integer.toString(i);
         }
         teamParam = greenAgent + "|" + greenTeam;
-
-        System.out.println(networkParam);
-        System.out.println(teamParam);
 
         //Print Green Network
         ProcessBuilder processBuilder = new ProcessBuilder("python", "./graphs/networkGrapher.py", networkParam, teamParam);
