@@ -471,7 +471,7 @@ public class GameRunner {
         teamParam = greenAgent + "|" + greenTeam;
 
         //Print Green Network
-        ProcessBuilder processBuilder = new ProcessBuilder("python", "./graphs/networkGrapher.py", networkParam, teamParam);
+        ProcessBuilder processBuilder = new ProcessBuilder("python", "./graphs/networkGrapher.py", networkParam, teamParam, gameInstance.getGreyTeams());
         processBuilder.redirectErrorStream(true);
         try {
             Process process = processBuilder.start();

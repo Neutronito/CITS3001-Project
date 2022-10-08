@@ -752,8 +752,8 @@ public class Game {
 
     /**
      * Getter for the green agent's voting opinion as a string
-     * @param redList pushes the current amount voting for red onto this list
-     * @param blueList pushes the current amount voting for blue onto this list
+     * Used for feeding into python script
+     * @return A string denoting green agent's voting opinion
      */
     public String getGreenTeams() {
         String greenTeams = "";
@@ -765,5 +765,22 @@ public class Game {
             }
         }
         return greenTeams;
+    }
+
+    /**
+     * Getter for the grey agent's voting opinion as a string
+     * Used for feeding into python script
+     * @return A string denoting grey agent's voting opinion
+     */
+    public String getGreyTeams() {
+        String greyTeams = "";
+        for (GreyAgent curAgent : greyAgentsList) {
+            if (curAgent.getBlueTeamStatus()) {
+                greyTeams += "1";
+            } else {
+                greyTeams += "0";
+            }
+        }
+        return greyTeams;
     }
 }
