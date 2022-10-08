@@ -42,14 +42,6 @@ plt.subplot(1, 2, 2)
 greyTeams   = sys.argv[3]
 greyAgents  = [x for x in range(len(greyTeams))]
 
-# for x in range(len(greyTeams)):
-#     if greyTeams[x] == "0":
-#         c = {"color": "red"}
-#     elif greyTeams[x] == "1":
-#         c = {"color": "blue"}
-#     node = (x, c)
-#     greyAgents.append(node)
-
 G = nx.Graph()
 G.add_nodes_from(greyAgents)
 colors = ["red" if x == "0" else "blue" for x in greyTeams]
