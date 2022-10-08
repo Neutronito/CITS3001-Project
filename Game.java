@@ -624,6 +624,15 @@ public class Game {
     }
 
     /**
+     * Getter for the adjacency matrix for the green network
+     * WARNING, returns a shallow copy so use with care
+     * @return The adjacency matrix for the green network
+     */
+    public double[][] getGreenNetwork() {
+        return greenNetwork;
+    }
+
+    /**
      * Returns the proportion of green agents with high certainty, 
      * the proportion of certain green agents with opinion 'vote',
      * the proportion of certain green agents with opinion 'not vote'.
@@ -739,5 +748,22 @@ public class Game {
 
         redList.add(redTotal);
         blueList.add(blueTotal);
+    }
+
+    /**
+     * Getter for the green agent's voting opinion as a string
+     * @param redList pushes the current amount voting for red onto this list
+     * @param blueList pushes the current amount voting for blue onto this list
+     */
+    public String getGreenTeams() {
+        String greenTeams = "";
+        for (GreenAgent curAgent : greenAgentsList) {
+            if (curAgent.getVotingOpinion()) {
+                greenTeams += "1";
+            } else {
+                greenTeams += "0";
+            }
+        }
+        return greenTeams;
     }
 }

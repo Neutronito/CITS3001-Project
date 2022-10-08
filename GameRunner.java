@@ -136,7 +136,7 @@ public class GameRunner {
 
             //Ask the user if they wish to see the graph
             if (displayGreenGraph) {
-                ProcessBuilder processBuilder = new ProcessBuilder("python", "./graphs/GreenGrapher.py", gameInstance.getFormattedGreenViews());
+                ProcessBuilder processBuilder = new ProcessBuilder("python", "./graphs/greenGrapher.py", gameInstance.getFormattedGreenViews());
                 processBuilder.redirectErrorStream(true);
                 
                 try {
@@ -183,6 +183,7 @@ public class GameRunner {
         if (displayEndGraphs) {
             displayEndGraphs();
         }
+        displayGreenNetwork();
         scanner.close();
         return 0;
     }
@@ -436,9 +437,57 @@ public class GameRunner {
         }  
     }
 
+    public void displayGreenNetwork() {
+        //Get the paramString for Green Network
+        String networkParam = "";
+        ArrayList<String> fromNodes = new ArrayList<>();
+        ArrayList<String> toNodes   = new ArrayList<>();
+        double[][] network = gameInstance.getGreenNetwork();
+        int greenAgentCount = network.length;
+
+        for (int i = 0; i < greenAgentCount; i++) {
+            for (int j = 0; j < greenAgentCount; j++) {
+                if (network[i][j] == 1.0 && (i != j)) {
+                    fromNodes.add(Integer.toString(i));
+                    toNodes.add(Integer.toString(j));
+                }
+            }
+        }
+
+        String fromNodesString = fromNodes.toString();
+        String toNodesString = toNodes.toString();
+        fromNodesString = fromNodesString.replace("[", "").replace("]", "").replace(" ", "");
+        toNodesString = toNodesString.replace("[", "").replace("]", "").replace(" ", "");
+        networkParam = fromNodesString + "|" + toNodesString;
+        
+        //Get the paramString for Green agent's opinion
+        String teamParam = "";
+        String greenAgent = "";
+        String greenTeam  = gameInstance.getGreenTeams();
+        for (int i = 0; i < greenAgentCount; i++) {
+            greenAgent += Integer.toString(i);
+        }
+        teamParam = greenAgent + "|" + greenTeam;
+
+        System.out.println(networkParam);
+        System.out.println(teamParam);
+
+        //Print Green Network
+        ProcessBuilder processBuilder = new ProcessBuilder("python", "./graphs/networkGrapher.py", networkParam, teamParam);
+        processBuilder.redirectErrorStream(true);
+        try {
+            Process process = processBuilder.start();
+            process.waitFor();
+        } catch(Exception e) {
+            System.out.println("Error, unable to launch the python script.");
+            System.out.println(e);
+        }  
+        
+    }
+
     public static void main(String[] args) {
         double[] uncertaintyInterval = {-1.0, 0.4};
-        GameRunner curRunner = new GameRunner(40, 0.4, 10, 40.0, uncertaintyInterval, 60.0);
+        GameRunner curRunner = new GameRunner(10, 0.4, 10, 40.0, uncertaintyInterval, 60.0);
         //Ask user if red agent is played by user or AI
         curRunner.playAsUser("red");
         //Ask user if blue agent is played by user or AI

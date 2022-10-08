@@ -10,6 +10,8 @@ import sys
 # following digits represent uncertainty * 10, must be integers
 # so -0.896475 would be -8
 
+plt.figure(figsize=(15,5))
+
 X = range(-10, 11, 1)
 for number in X:
     number /= 10
@@ -46,7 +48,6 @@ for argument in argumentsList:
         #not voting
         else:
             agents_not_voting[argument + 10] += 1
-
   
 X_axis = np.arange(len(X))
   
