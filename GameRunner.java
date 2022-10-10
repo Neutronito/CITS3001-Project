@@ -204,7 +204,7 @@ public class GameRunner {
         else {
             redPotency = getMessagePotency("red");
         }
-        System.out.printf("Red AI chose Potency %d.\n", redPotency);
+        System.out.printf("Red Agent chose Potency %d.\n", redPotency);
         gameInstance.executeRedTurn(redPotency, false);
     }
 
@@ -236,7 +236,7 @@ public class GameRunner {
         } 
         //If option 2 is chosen - let grey agent into green network.
         else if (blueOption == 2) {
-            System.out.printf("Blue AI chose Option %d.\n", blueOption);
+            System.out.printf("Blue Agent chose Option %d.\n", blueOption);
             gameInstance.executeBlueTurn2();
         }
     }
