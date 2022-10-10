@@ -392,7 +392,7 @@ public class Game {
 
             // If blue turn is not executed by grey agent and green agent is certain, decrease energy level
             // Green agent is certain if uncertainty is less than 0
-            // The more potent a message, the higher the energy loss
+            // The more certain the green agent is, the higher the energy loss
             if (!byGreyAgent && curAgent.getUncertainty() < 0) {
                 double curUncertainty = -curAgent.getUncertainty(); 
                 double energyLoss =  curUncertainty * ENERGYSCALEFACTOR;
