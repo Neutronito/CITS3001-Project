@@ -751,6 +751,26 @@ public class Game {
     }
 
     /**
+     * Getter for the current voting opinions of the green network in the game
+     * @return the voting opinions of the green network in the game
+     */
+    public int[] getVotingOpinions() {
+        int redTotal = 0;
+        int blueTotal = 0;
+
+        for (GreenAgent curAgent : greenAgentsList) {
+            if (curAgent.getVotingOpinion()) {
+                blueTotal++;
+            } else {
+                redTotal++;
+            }
+        }
+        
+        int[] output = {redTotal, blueTotal};
+        return output;
+    }
+
+    /**
      * Getter for the green agent's voting opinion as a string
      * Used for feeding into python script
      * @return A string denoting green agent's voting opinion
