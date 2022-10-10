@@ -48,7 +48,7 @@ public class BlueAgent {
         if ((energyLevel - decreasedAmount) < 0) {
             energyLevel = 0;
         } else {
-            energyLevel = energyLevel + decreasedAmount;
+            energyLevel = energyLevel - decreasedAmount;
         }
     }
 

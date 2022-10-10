@@ -37,7 +37,7 @@ public class RedAgent {
         if ((followerCount + increasedAmount) > maxFollowers) {
             followerCount = maxFollowers;
         } else {
-            followerCount = followerCount - increasedAmount;
+            followerCount = followerCount + increasedAmount;
         }
     }
 

@@ -329,8 +329,6 @@ public class Game {
             if (messagePotency >= 3) {
                 int potency = messagePotency - 3;
                 int followerLoss = (int) (greenAgentCount * potency * FOLLOWERSCALEFACTOR);
-                System.out.println("WHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOT " + greenAgentCount + potency + FOLLOWERSCALEFACTOR);
-                System.out.println("WHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOT decreased amount is " + followerLoss);
                 redAgent.decrementFollower(followerLoss); 
             }
         }
