@@ -34,9 +34,10 @@ public class RedAgent {
      * @param increasedAmount the amount to increment the follower count by
      */
     public void incrementFollower(int increasedAmount) {
-        followerCount = followerCount + increasedAmount;
-        if (followerCount > maxFollowers) {
+        if ((followerCount + increasedAmount) > maxFollowers) {
             followerCount = maxFollowers;
+        } else {
+            followerCount = followerCount + increasedAmount;
         }
     }
 
@@ -45,9 +46,11 @@ public class RedAgent {
      * @param increasedAmount the amount to decrement the follower count by
      */
     public void decrementFollower(int decreasedAmount) {
-        followerCount = followerCount - decreasedAmount;
-        if (followerCount < 0) {
+        if ((followerCount - decreasedAmount) < 0) {
             followerCount = 0;
+        } else {
+            followerCount = followerCount - decreasedAmount;
         }
+
     }
 }

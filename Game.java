@@ -392,7 +392,7 @@ public class Game {
 
             // If blue turn is not executed by grey agent and green agent is certain, decrease energy level
             // Green agent is certain if uncertainty is less than 0
-            // The more potent a message, the higher the energy loss
+            // The more certain the green agent is, the higher the energy loss
             if (!byGreyAgent && curAgent.getUncertainty() < 0) {
                 double curUncertainty = -curAgent.getUncertainty(); 
                 double energyLoss =  curUncertainty * ENERGYSCALEFACTOR;
@@ -748,6 +748,26 @@ public class Game {
 
         redList.add(redTotal);
         blueList.add(blueTotal);
+    }
+
+    /**
+     * Getter for the current voting opinions of the green network in the game
+     * @return the voting opinions of the green network in the game
+     */
+    public int[] getVotingOpinions() {
+        int redTotal = 0;
+        int blueTotal = 0;
+
+        for (GreenAgent curAgent : greenAgentsList) {
+            if (curAgent.getVotingOpinion()) {
+                blueTotal++;
+            } else {
+                redTotal++;
+            }
+        }
+        
+        int[] output = {redTotal, blueTotal};
+        return output;
     }
 
     /**
