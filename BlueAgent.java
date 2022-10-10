@@ -35,16 +35,20 @@ public class BlueAgent {
     public void incrementEnergy(double increasedAmount) {
         if ((energyLevel + increasedAmount) > maxEnergy) {
             energyLevel = maxEnergy;
+        } else {
+            energyLevel = energyLevel + increasedAmount;
         }
     }
 
     /**
      * Decrement the blue agent energy level by an amount
-     * @param increasedAmount the amount to decrement the energy level by
+     * @param decreasedAmount the amount to decrement the energy level by
      */
     public void decrementEnergy(double decreasedAmount) {
         if ((energyLevel - decreasedAmount) < 0) {
             energyLevel = 0;
+        } else {
+            energyLevel = energyLevel + decreasedAmount;
         }
     }
 

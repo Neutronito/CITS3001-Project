@@ -488,7 +488,7 @@ public class GameRunner {
 
     public static void main(String[] args) {
         double[] uncertaintyInterval = {-1.0, 0.4};
-        GameRunner curRunner = new GameRunner(10, 0.4, 10, 40.0, uncertaintyInterval, 60.0);
+        GameRunner curRunner = new GameRunner(40, 0.4, 10, 40.0, uncertaintyInterval, 60.0);
         //Ask user if red agent is played by user or AI
         curRunner.playAsUser("red");
         //Ask user if blue agent is played by user or AI

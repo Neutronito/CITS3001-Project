@@ -36,6 +36,8 @@ public class RedAgent {
     public void incrementFollower(int increasedAmount) {
         if ((followerCount + increasedAmount) > maxFollowers) {
             followerCount = maxFollowers;
+        } else {
+            followerCount = followerCount - increasedAmount;
         }
     }
 
@@ -46,6 +48,9 @@ public class RedAgent {
     public void decrementFollower(int decreasedAmount) {
         if ((followerCount - decreasedAmount) < 0) {
             followerCount = 0;
+        } else {
+            followerCount = followerCount - decreasedAmount;
         }
+
     }
 }
