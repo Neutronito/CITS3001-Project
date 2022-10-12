@@ -6,6 +6,12 @@ import java.io.File;
 import java.io.FileNotFoundException; 
 import java.util.Scanner;
 
+import javax.management.ValueExp;
+
+import java.nio.file.*;
+import java.io.IOException;
+import java.io.FileWriter;
+
 
 public class RedAI {
 
@@ -13,7 +19,7 @@ public class RedAI {
     private ArrayList<Integer[]> currentMoves;
 
     //Stores all moves the AI has done, and their rewards
-    //The first digit is the move, and the two next left digits are the reward from -100 to 100
+    //The first digit is the move, and the next left digits are the reward from -100 to 100
     private HashMap<Integer, Integer> allMoves;
 
     //Tuning Parameters for the AI
@@ -21,14 +27,12 @@ public class RedAI {
     private final int REWARDDIFFERENCE = 25; //If the difference is above this value, it is considered big enough to choose the better option
     private final int WORSTMOVEMIN = -10; //If we have 2 bad moves, provided one of them is above this value, we will still choose it
 
-    boolean hashMapFileExists;
-
     public RedAI() {
         currentMoves = new ArrayList<>();
         allMoves = new HashMap<>();
 
         //Read from the txt file if it exists
-        //Each line represents a key value pair, the key and the value seperated by a single whitespace
+        //Each line represents a key value pair, the key and the value seperated by a single whitespace, respectively
         try {
             File myObj = new File("redMap.txt");
             Scanner myReader = new Scanner(myObj);
@@ -41,12 +45,10 @@ public class RedAI {
 
             }
             myReader.close();
-            hashMapFileExists = true;
         } 
           
-        //Doesnt exist, thats not a problem, just set the flag accordingly
+        //Doesnt exist, thats not a problem and we just continue
         catch (FileNotFoundException e) {
-            hashMapFileExists = false;
         }
 
     }
@@ -74,7 +76,7 @@ public class RedAI {
             if (mapValue != null) {
                 
                 int reward = mapValue / 10;
-                int potency = mapValue % 10;
+                int potency = Math.abs(mapValue) % 10;
                 //We have a good move to consider
                 if (reward > 0) {
                     //We will see if the move we did in the past was any good
@@ -188,13 +190,21 @@ public class RedAI {
         
         //There is no entry, so we can just fill it
         if (hashReward == null) {
-            allMoves.put(mapHash, reward);
+            int hashValue = Math.abs(reward * 10) + previousMove;
+            if (reward < 0) {
+                hashValue *= -1;
+            }
+            allMoves.put(mapHash, hashValue);
         } else {
             //There is something already here.
             //I want to try something, i want the algorithm to trust its previous moves more than the map,
             //so I am going to make it take the smallest value
             if (reward < hashReward) {
-                allMoves.put(mapHash, reward);
+                int hashValue = Math.abs(reward * 10) + previousMove;
+                if (reward < 0) {
+                    hashValue *= -1;
+                }
+                allMoves.put(mapHash, hashValue);
             } 
         }
 
@@ -209,7 +219,44 @@ public class RedAI {
     /**
      * Must be called when the game ends, saves the updated hashmap into the txt file
      */
-    public static void endGame() {
+    public void endGame() {
+        //If the file exists delete it
+        Path path = FileSystems.getDefault().getPath("./src/test/resources/redMap.txt");
+        try {
+            Files.delete(path);
+        } catch(Exception e) {
+            //If the file doesnt exist no need to do anything
+        }
 
+        //Now write the current hashMap into the file
+        FileWriter fileWriter = null;
+        try {
+            //Creating File Object.
+            File file = new File("redMap.txt");
+            //Initializing filewriter object.
+            fileWriter = new FileWriter(file);
+
+
+            //Loop through the hashmap, writing it into the file
+            //Each line represents a key value pair, the key and the value seperated by a single whitespace, respectively
+            for (HashMap.Entry<Integer, Integer> entry : allMoves.entrySet()){
+                fileWriter.write(Integer.toString(entry.getKey()) + " " + Integer.toString(entry.getValue()) + "\n");
+            }
+        } 
+        catch (IOException iOException) {
+            System.out.println("Error : " + iOException.getMessage());
+        } 
+        finally {
+ 
+            if (fileWriter != null) {
+                try {
+                    //Closing file writer object.
+                    fileWriter.close();
+                } catch (IOException iOException) {
+                    System.out.println("Error : " + iOException.getMessage());
+                }
+            }
+ 
+        }
     }
 }
