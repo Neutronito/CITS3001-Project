@@ -12,7 +12,6 @@ import java.nio.file.*;
 import java.io.IOException;
 import java.io.FileWriter;
 
-
 public class RedAI {
 
     //First index is the map hash, the second index is the move the AI did and the third is the reward
@@ -42,7 +41,6 @@ public class RedAI {
                 String[] pair = data.split(" ");
                 
                 allMoves.put(Integer.parseInt(pair[0]), Integer.parseInt(pair[1]));
-
             }
             myReader.close();
         } 
@@ -50,7 +48,12 @@ public class RedAI {
         //Doesnt exist, thats not a problem and we just continue
         catch (FileNotFoundException e) {
         }
+    }
 
+    //Returns a random number from 1 to 6
+    public static int randomMove() {
+        Random numGen = new Random();
+        return numGen.nextInt(5) + 1;
     }
 
     /**
@@ -93,7 +96,7 @@ public class RedAI {
                     int previousPotency = previousMove[1];
                     int previousReward = previousMove[2];
 
-                    //if one move is obviously better than the other, just take it
+                    //If one move is obviously better than the other, just take it
                     int rewardDifference = Math.abs(previousReward - reward);
 
                     if (rewardDifference > REWARDDIFFERENCE) {
@@ -210,12 +213,6 @@ public class RedAI {
 
     }
 
-    //Returns a random number from 1 to 6
-    public static int randomMove() {
-        Random numGen = new Random();
-        return numGen.nextInt(5) + 1;
-    }
-
     /**
      * Must be called when the game ends, saves the updated hashmap into the txt file
      */
@@ -231,11 +228,10 @@ public class RedAI {
         //Now write the current hashMap into the file
         FileWriter fileWriter = null;
         try {
-            //Creating File Object.
+            //Creating File Object
             File file = new File("redMap.txt");
-            //Initializing filewriter object.
+            //Initializing filewriter object
             fileWriter = new FileWriter(file);
-
 
             //Loop through the hashmap, writing it into the file
             //Each line represents a key value pair, the key and the value seperated by a single whitespace, respectively
@@ -247,16 +243,14 @@ public class RedAI {
             System.out.println("Error : " + iOException.getMessage());
         } 
         finally {
- 
             if (fileWriter != null) {
                 try {
-                    //Closing file writer object.
+                    //Closing file writer object
                     fileWriter.close();
                 } catch (IOException iOException) {
                     System.out.println("Error : " + iOException.getMessage());
                 }
             }
- 
         }
     }
 }

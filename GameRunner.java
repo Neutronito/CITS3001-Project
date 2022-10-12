@@ -239,7 +239,8 @@ public class GameRunner {
 
         //If blue AI is playing
         if (playAsBlueAI) {
-            blueOption = blueAI.chooseBlueOption(gameInstance.hasMoreCertainVoters(), gameInstance.getBlueEnergyLevel(), gameInstance.getProportionCertain());
+            blueOption = blueAI.chooseBlueOption();
+            // blueOption = blueAI.chooseBlueOption(gameInstance.hasMoreCertainVoters(), gameInstance.getBlueEnergyLevel(), gameInstance.getProportionCertain());
         } 
         //If user is playing
         else {
@@ -249,7 +250,8 @@ public class GameRunner {
         //If option 1 is chosen - interact with all green agents.
         if (blueOption == 1) {
             if (playAsBlueAI) {
-                bluePotency = blueAI.chooseMessagePotency(gameInstance.getGreenAgentsList());
+                int mapHash = gameInstance.hashBoardState();
+                bluePotency = blueAI.chooseMessagePotency(mapHash);
                 System.out.printf("Blue AI chose Option %d and Potency %d.\n", blueOption, bluePotency);
             } else {
                 bluePotency = getMessagePotency("blue");

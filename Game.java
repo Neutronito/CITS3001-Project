@@ -809,9 +809,7 @@ public class Game {
      * @return The hash, right four digits show the number voting, and the next left four show the number not voting
      */
     public int hashBoardState() {
-
         int[] votingNumbers = getVotingOpinions();
         return votingNumbers[1] + votingNumbers[0] * 10000;
-
     }
 }

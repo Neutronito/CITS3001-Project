@@ -1,180 +1,259 @@
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Random;
+
+import java.io.File; 
+import java.io.FileNotFoundException; 
+import java.util.Scanner;
+
+import javax.management.ValueExp;
+
+import java.nio.file.*;
+import java.io.IOException;
+import java.io.FileWriter;
+
 public class BlueAI {
+    //First index is the map hash, the second index is the move the AI did and the third is the reward
+    private ArrayList<Integer[]> currentMoves;
 
-    private final double MINGROUPDIFFERENCE = 0.5; //This is the minimum difference between the two groups
+    //Stores all moves the AI has done, and their rewards
+    //The first digit is the move, and the next left digits are the reward from -100 to 100
+    private HashMap<Integer, Integer> allMoves;
 
-    private int blueOption;
-    private int messagePotency;
-    
+    //Tuning Parameters for the AI
+    private final int EXPLORATIONRATE = 30; //30%, so 0.3 chance of doing a random explore move instead of exploitation
+    private final int REWARDDIFFERENCE = 25; //If the difference is above this value, it is considered big enough to choose the better option
+    private final int WORSTMOVEMIN = -10; //If we have 2 bad moves, provided one of them is above this value, we will still choose it
+
     public BlueAI() {
-        blueOption = 1;
-        messagePotency = 1;
+        currentMoves = new ArrayList<>();
+        allMoves = new HashMap<>();
+
+        //Read from the txt file if it exists
+        //Each line represents a key value pair, the key and the value seperated by a single whitespace, respectively
+        try {
+            File myObj = new File("blueMap.txt");
+            Scanner myReader = new Scanner(myObj);
+            
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+                String[] pair = data.split(" ");
+                
+                allMoves.put(Integer.parseInt(pair[0]), Integer.parseInt(pair[1]));
+            }
+            myReader.close();
+        } 
+          
+        //Doesnt exist, thats not a problem and we just continue
+        catch (FileNotFoundException e) {
+        }
     }
 
-    public int chooseBlueOption(boolean hasMoreCertainVoters, double blueEnergyLevel, double[] proportionCertain) {
-        /*
-         *  Option 1 : Interact with Green team
-         *  - good when Blue AI has high energh level
-         *  - good when there are more certain green agents who are voting (uncertainty < 0)
-         *  to try end the game faster in favour of Blue Agent
-         * 
-         *  Option 2 : Let a Grey agent in the Green network
-         *  - good when Blue AI has low energh level
-         *  - good when there are more certain green agents who are NOT voting (uncertainty < 0)
-         */
-
-        //Index 0 - probability of choosing option 1
-        //Index 1 - probability of choosing option 2
-        double[] optionProbability = {0.5, 0.5};
-        double changeInProbability;
-        double proportionCertainGreens  = proportionCertain[0];
-        double proportionCertainBlues   = proportionCertain[1];
-        double proportionUncertainGreens = 1.0 - proportionCertainGreens;
-        
-        //Higher the proportion of certain greens means lower chance of choosing option 1 (save energy)
-        if (proportionCertainGreens > 0.5) {
-            changeInProbability = (proportionCertainGreens - 0.5) / 2.0;    //Based on proportion of certain greens
-            optionProbability[0] -= changeInProbability;                    //Decrease chance of option 1
-            optionProbability[1] += changeInProbability;                    //Increase chance of option 2
-        } 
-        //Higher the proportion of uncertain greens means higher chance of choosing option 1 (save energy)
-        else {
-            changeInProbability = (proportionUncertainGreens - 0.5) / 2.0;  //Based on proportion of certain greens
-            optionProbability[0] += changeInProbability;                    //Increase chance of option 1
-            optionProbability[1] -= changeInProbability;                    //Decrease chance of option 2
-        }
-        
-        //Energy is low
-        if (blueEnergyLevel < 50.0) {
-            //Blue is winning and low energy, therefore higher chance of choosing option 1
-            if (hasMoreCertainVoters) {
-                changeInProbability = (proportionCertainBlues) / 2.0; //Based on proportion of certain blues
-                optionProbability[0] += changeInProbability;          //Increase chance of option 1
-                optionProbability[1] -= changeInProbability;          //Decrease chance of option 2
-            } 
-             //Blue is losing and low energy, therefore higher chance of choosing option 2
-            else {
-                changeInProbability = (proportionCertainBlues) / 2.0; //Based on proportion of certain blues
-                optionProbability[0] -= changeInProbability;          //Decrease chance of option 1
-                optionProbability[1] += changeInProbability;          //Increase chance of option 2
-            }
-        }
-        //Energy is high
-        else {
-            //Blue is winning and high energy, therefore higher chance of choosing option 2
-            if (hasMoreCertainVoters) {
-                changeInProbability = (proportionCertainBlues) / 2.0; //Based on proportion of certain blues
-                optionProbability[0] -= changeInProbability;          //Increase chance of option 1
-                optionProbability[1] += changeInProbability;          //Decrease chance of option 2
-            } 
-             //Blue is losing and high energy, therefore higher chance of choosing option 1
-            else {
-                changeInProbability = (proportionCertainBlues) / 2.0; //Based on proportion of certain blues
-                optionProbability[0] += changeInProbability;          //Decrease chance of option 1
-                optionProbability[1] -= changeInProbability;          //Increase chance of option 2
-            }
-        }
-
-        //Now choose blue option based on probability of being chosen
-        double optionGenerator = Math.random();
-
-        if (optionProbability[0] < optionProbability[1]) {
-            if (optionGenerator > optionProbability[0] && optionGenerator < 1.0) {
-                blueOption = 2;
-            } else {
-                blueOption = 1;
-            }
-        }
-        else {
-            if (optionGenerator > optionProbability[1] && optionGenerator < 1.0) {
-                blueOption = 1;
-            } else {
-                blueOption = 2;
-            }
-        }
-        return blueOption;
+    //Returns a random number from 1 to 6
+    public static int randomMove() {
+        Random numGen = new Random();
+        return numGen.nextInt(5) + 1;
     }
 
-    public int chooseMessagePotency(GreenAgent[] greenList) {
-         /*
-         *  The general strategy of the Blue AI is as follows:
-         * 
-         *  The lower half potency is good for when there are many certain blue agents and 
-         *  many certain red agents.
-         * 
-         *  The upper half potency is good for when there are many uncertain blue agents and 
-         *  many uncertain red agents.
-         */
+    public int chooseBlueOption() {
+        return 1;
+    }
+    /**
+     * Exectues reinforcement learning to decide the move to play at this current point in the game
+     * @return The message potency to play
+     */
+    public int chooseMessagePotency(int currentGameHash) {
+        Random numGen = new Random();
+        //generate random number to see which method we use
+        int randInt = numGen.nextInt(100);
 
-        int greenCount = greenList.length;
-
-        /*
-         * This array is split into four factors
-         * 
-         * Blue Team
-         * Blue certain is index    0
-         * Blue uncertain is index  1
-         * 
-         * Red Team
-         * Red certain is index     2
-         * Red uncertain is index   3
-         */
-        double[] proportionFactor = new double[4];
-
-        //Loop through and process all the green agents
-        for (GreenAgent curAgent : greenList) {
-            int indexToWrite = 1;
-            
-            if (!curAgent.getVotingOpinion()) {
-                indexToWrite = 3;
-            }
-            
-            double curUncertainty = curAgent.getUncertainty();
-            if (curUncertainty < 0) {
-                indexToWrite--;
-                curUncertainty *= -1;
-            }
-            proportionFactor[indexToWrite] += curUncertainty;
-        }
-
-        //Divide by total agents to obtain a weighting from 0 to 1
-        for (int i = 0; i < 4; i++) {
-            proportionFactor[i] /= greenCount;
-        }
-
-        //Since the two extremeties of potency affect to areas together, we can group them
-        double groupedHighPotency = proportionFactor[1] + proportionFactor[3];
-        double groupedLowPotency = proportionFactor[0] + proportionFactor[2];
-
-        double difference = groupedHighPotency - groupedLowPotency;
-
-        //Low Potency Message Dominates
-        if (difference < -MINGROUPDIFFERENCE) {
-            messagePotency = 1;
-            return messagePotency;
+        //Exploration, so pick a random move
+        if (randInt < EXPLORATIONRATE) {
+            return randomMove();
         } 
         
-        //High Potency Message Dominates
-        else if (difference > MINGROUPDIFFERENCE) {
-            messagePotency = 6;
-            return messagePotency;
+        //Use exploitation to pick the best move
+        else {
+            //check for this move in our moves table
+            Integer mapValue = allMoves.get(currentGameHash);
+
+            //We have a past move we can use
+            if (mapValue != null) {
+                
+                int reward = mapValue / 10;
+                int potency = Math.abs(mapValue) % 10;
+                //We have a good move to consider
+                if (reward > 0) {
+                    //We will see if the move we did in the past was any good
+                    Integer previousMove[];
+
+                    if (!currentMoves.isEmpty()) {
+                        previousMove = currentMoves.get(currentMoves.size() - 1);
+                    } 
+                    //If no previous move exists, fill it with this placeholder 
+                    else {
+                        Integer newInt[] = {0, 0, -100}; 
+                        previousMove = newInt;
+                    }
+                    int previousPotency = previousMove[1];
+                    int previousReward = previousMove[2];
+
+                    //If one move is obviously better than the other, just take it
+                    int rewardDifference = Math.abs(previousReward - reward);
+
+                    if (rewardDifference > REWARDDIFFERENCE) {
+                        if (previousReward > reward) {
+                            return previousPotency;
+                        } else {
+                            return potency;
+                        }
+                    }
+
+                    //This means the moves rewards are very close, and so we will trust the previous move is the best move, provided its reward was positive
+                    if (previousReward > 0) {
+                        return previousPotency;
+                    } else {
+                        return potency;
+                    }
+                }
+                //The reward is poor, so the move we did back then wasn't very good
+                else {
+                    //We will see if the move we did in the past was any good
+                    Integer previousMove[];
+                    if (!currentMoves.isEmpty()) {
+                        previousMove = currentMoves.get(currentMoves.size() - 1);
+                    } else {
+                        Integer newInt[] = {0, 0, -100}; 
+                        previousMove = newInt;
+                    }
+                    int previousPotency = previousMove[1];
+                    int previousReward = previousMove[2];
+
+                    //The previous move was at the very least ok, so we will do it again
+                    if (previousReward > 0) {
+                        return previousPotency;
+                    }
+
+                    //If either of the moves were not too terrible, pick them anyway
+                    if (previousReward > WORSTMOVEMIN) {
+                        return previousPotency;
+                    } 
+                    else if (reward > WORSTMOVEMIN) {
+                        return potency;
+                    }
+                    //They are both terrible moves, so just return a random move that isnt either of those two
+                    else {
+                        int moveToDo = previousPotency;
+                        while (moveToDo == previousPotency || moveToDo == potency) {
+                            moveToDo = randomMove();
+                        }
+                        return moveToDo;
+                    }
+                }
+
+            }
+            //There is no move in our map, if our last move was good use it, else try a new move that wasn't the last move
+            else {
+                Integer previousMove[];
+                if (!currentMoves.isEmpty()) {
+                    previousMove = currentMoves.get(currentMoves.size() - 1);
+                } else {
+                    Integer newInt[] = {0, 0, -100}; 
+                    previousMove = newInt;
+                }
+                int previousPotency = previousMove[1];
+                int previousReward = previousMove[2];
+
+                //The previous move was good
+                if (previousReward > 0) {
+                    return previousPotency;
+                } 
+                //The previous move was bad, so pick a random one
+                else {
+                    int moveToDo = previousPotency;
+                        while (moveToDo == previousPotency) {
+                            moveToDo = randomMove();
+                        }
+                        return moveToDo;
+                }
+            }
+        }
+          
+    }
+
+
+    public void updateRewards(int reward, int mapHash, int previousMove) {
+        //Store this move in our previous moves array
+        Integer[] playedMove = new Integer[3];
+        playedMove[0] = mapHash;
+        playedMove[1] = previousMove;
+        playedMove[2] = reward;
+        
+        currentMoves.add(playedMove);
+
+        //Now update the hashmap
+        Integer hashReward = allMoves.get(mapHash);
+        
+        //There is no entry, so we can just fill it
+        if (hashReward == null) {
+            int hashValue = Math.abs(reward * 10) + previousMove;
+            if (reward < 0) {
+                hashValue *= -1;
+            }
+            allMoves.put(mapHash, hashValue);
+        } else {
+            //There is something already here.
+            //I want to try something, i want the algorithm to trust its previous moves more than the map,
+            //so I am going to make it take the smallest value
+            if (reward < hashReward) {
+                int hashValue = Math.abs(reward * 10) + previousMove;
+                if (reward < 0) {
+                    hashValue *= -1;
+                }
+                allMoves.put(mapHash, hashValue);
+            } 
         }
 
-        //The potency is very close, so we should act in between extremities
-        else if (difference < 0) {
-            if (difference < -(MINGROUPDIFFERENCE / 2)) {
-                messagePotency = 2;
-            } else {
-                messagePotency = 3;
+    }
+
+    /**
+     * Must be called when the game ends, saves the updated hashmap into the txt file
+     */
+    public void endGame() {
+        //If the file exists delete it
+        Path path = FileSystems.getDefault().getPath("./src/test/resources/blueMap.txt");
+        try {
+            Files.delete(path);
+        } catch(Exception e) {
+            //If the file doesnt exist no need to do anything
+        }
+
+        //Now write the current hashMap into the file
+        FileWriter fileWriter = null;
+        try {
+            //Creating File Object
+            File file = new File("blueMap.txt");
+            //Initializing filewriter object
+            fileWriter = new FileWriter(file);
+
+            //Loop through the hashmap, writing it into the file
+            //Each line represents a key value pair, the key and the value seperated by a single whitespace, respectively
+            for (HashMap.Entry<Integer, Integer> entry : allMoves.entrySet()){
+                fileWriter.write(Integer.toString(entry.getKey()) + " " + Integer.toString(entry.getValue()) + "\n");
             }
         } 
-        //The difference must be between 0 and +Minimum group difference
-        else {
-            if (difference > (MINGROUPDIFFERENCE / 2)) {
-                messagePotency = 5;
-            } else {
-                messagePotency = 4;
+        catch (IOException iOException) {
+            System.out.println("Error : " + iOException.getMessage());
+        } 
+        finally {
+            if (fileWriter != null) {
+                try {
+                    //Closing file writer object
+                    fileWriter.close();
+                } catch (IOException iOException) {
+                    System.out.println("Error : " + iOException.getMessage());
+                }
             }
         }
-        return messagePotency;
     }
 }
