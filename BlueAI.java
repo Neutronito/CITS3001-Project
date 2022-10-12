@@ -25,6 +25,9 @@ public class BlueAI {
     private final int REWARDDIFFERENCE = 25; //If the difference is above this value, it is considered big enough to choose the better option
     private final int WORSTMOVEMIN = -10; //If we have 2 bad moves, provided one of them is above this value, we will still choose it
 
+    /*
+     * TODO : Blue AI Option
+     */
     public BlueAI() {
         currentMoves = new ArrayList<>();
         allMoves = new HashMap<>();

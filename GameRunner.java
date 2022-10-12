@@ -125,12 +125,11 @@ public class GameRunner {
             int redMove = playRedTurn();
 
             //Execute the blue turn
-            playBlueTurn();
+            int blueMove = playBlueTurn();
             
             //Execute the green turn
             System.out.println("\nGREEN TEAM");
             gameInstance.executeGreenTurn();
-
 
             if (playAsRedAI) {
                 int[] distribution = gameInstance.getVotingOpinions();
@@ -141,8 +140,17 @@ public class GameRunner {
                 int mapHash = gameInstance.hashBoardState();
                 redAI.updateRewards(reward, mapHash, redMove);
             }
-            
 
+            if (playAsBlueAI) {
+                int[] distribution = gameInstance.getVotingOpinions();
+            
+                //Execute the red rewards
+                int blueGain = distribution[1] - beforeTurnDistribution[1];
+                int reward = (int)((double)(blueGain) / (double)(distribution[0] + distribution[1]) * 100.0);
+                int mapHash = gameInstance.hashBoardState();
+                blueAI.updateRewards(reward, mapHash, redMove);
+            }
+            
             //Print the metrics now
             gameInstance.printGreenAgents();
             gameInstance.printGreenStatistics();
@@ -202,6 +210,7 @@ public class GameRunner {
 
         //store AI hashmaps
         redAI.endGame();
+        blueAI.endGame();
 
         scanner.close();
         return 0;
@@ -230,10 +239,13 @@ public class GameRunner {
         return redPotency;
     }
 
+    /*
+     * TODO : Blue AI Option
+     */
     /**
      * Executes the Blue agent turn, depending on whether user or AI is playing.
      */
-    public void playBlueTurn() {
+    public int playBlueTurn() {
         int blueOption, bluePotency;
         System.out.println("\nBLUE AGENT'S TURN");
 
@@ -246,6 +258,8 @@ public class GameRunner {
         else {
             blueOption = getBlueOption();
         }
+        
+        bluePotency = 1; // FIX THIS
 
         //If option 1 is chosen - interact with all green agents.
         if (blueOption == 1) {
@@ -264,6 +278,8 @@ public class GameRunner {
             System.out.printf("Blue Agent chose Option %d.\n", blueOption);
             gameInstance.executeBlueTurn2();
         }
+
+        return bluePotency;
     }
 
     /**
