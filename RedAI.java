@@ -144,8 +144,34 @@ public class RedAI {
           
     }
 
+    public void updateRewards(int reward, int mapHash, int previousMove) {
+        //Store this move in our previous moves array
+        Integer[] playedMove = new Integer[3];
+        playedMove[0] = mapHash;
+        playedMove[1] = previousMove;
+        playedMove[2] = reward;
+        
+        currentMoves.add(playedMove);
+
+        //Now update the hashmap
+        Integer hashReward = allMoves.get(mapHash);
+        
+        //There is no entry, so we can just fill it
+        if (hashReward == null) {
+            allMoves.put(mapHash, reward);
+        } else {
+            //There is something already here.
+            //I want to try something, i want the algorithm to trust its previous moves more than the map,
+            //so I am going to make it take the smallest value
+            if (reward < hashReward) {
+                allMoves.put(mapHash, reward);
+            } 
+        }
+
+    }
+
     //Returns a random number from 1 to 6
-    public int randomMove() {
+    public static int randomMove() {
         Random numGen = new Random();
         return numGen.nextInt(5) + 1;
     }
