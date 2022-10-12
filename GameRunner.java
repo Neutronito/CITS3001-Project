@@ -111,7 +111,7 @@ public class GameRunner {
         int numIterations = 0;
         gameInstance.printGreenAgents();
         gameInstance.printGreenStatistics();
-        displayGreenNetwork();
+        // displayGreenNetwork();
         Scanner scanner = new Scanner(System.in);
         //True when game end is triggered, false when game is running
         boolean triggerGameEnd = false;         
@@ -198,7 +198,7 @@ public class GameRunner {
         if (displayEndGraphs) {
             displayEndGraphs();
         }
-        displayGreenNetwork();
+        // displayGreenNetwork();
 
         //store AI hashmaps
         redAI.endGame();
