@@ -118,9 +118,11 @@ public class GameRunner {
 
         while (!triggerGameEnd) {
             numIterations++;
+            //store the voting distribution
+            int[] beforeTurnDistribution = gameInstance.getVotingOpinions();
 
             //Execute the red turn
-            playRedTurn();
+            int redMove = playRedTurn();
 
             //Execute the blue turn
             playBlueTurn();
@@ -128,6 +130,19 @@ public class GameRunner {
             //Execute the green turn
             System.out.println("\nGREEN TEAM");
             gameInstance.executeGreenTurn();
+
+
+            if (playAsRedAI) {
+                int[] distribution = gameInstance.getVotingOpinions();
+            
+                //Execute the red rewards
+                int redGain = distribution[0] - beforeTurnDistribution[0];
+                int reward = redGain / (distribution[0] + distribution[1]) * 100;
+                int mapHash = gameInstance.hashBoardState();
+
+                redAI.updateRewards(reward, mapHash, redMove);
+            }
+            
 
             //Print the metrics now
             gameInstance.printGreenAgents();
@@ -191,14 +206,16 @@ public class GameRunner {
 
     /**
      * Executes the Red agent turn, depending on whether user or AI is playing.
+     * @return The potency value red played
      */
-    public void playRedTurn() {
+    public int playRedTurn() {
         int redPotency;
         System.out.println("\nRED AGENT'S TURN");
 
         //If red AI is playing
         if (playAsRedAI) {
-            redPotency = redAI.chooseMessagePotency(gameInstance.getGreenAgentsList());
+            int mapHash = gameInstance.hashBoardState();
+            redPotency = redAI.chooseMessagePotency(mapHash);
         }
         //If user is playing
         else {
@@ -206,6 +223,8 @@ public class GameRunner {
         }
         System.out.printf("Red Agent chose Potency %d.\n", redPotency);
         gameInstance.executeRedTurn(redPotency, false);
+
+        return redPotency;
     }
 
     /**
