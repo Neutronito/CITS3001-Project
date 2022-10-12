@@ -752,7 +752,7 @@ public class Game {
 
     /**
      * Getter for the current voting opinions of the green network in the game
-     * @return the voting opinions of the green network in the game
+     * @return voting opinion array, first index is red total and second index is green total
      */
     public int[] getVotingOpinions() {
         int redTotal = 0;
@@ -802,5 +802,16 @@ public class Game {
             }
         }
         return greyTeams;
+    }
+
+    /**
+     * Hashes the current board state, to be stored in the hashmap of the AIs 
+     * @return The hash, right four digits show the number voting, and the next left four show the number not voting
+     */
+    public int hashBoardState() {
+
+        int[] votingNumbers = getVotingOpinions();
+        return votingNumbers[1] + votingNumbers[0] * 10000;
+
     }
 }
