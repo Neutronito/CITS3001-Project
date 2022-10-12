@@ -2,6 +2,11 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Random;
 
+import java.io.File; 
+import java.io.FileNotFoundException; 
+import java.util.Scanner;
+
+
 public class RedAI {
 
     //First index is the map hash, the second index is the move the AI did and the third is the reward
@@ -16,9 +21,34 @@ public class RedAI {
     private final int REWARDDIFFERENCE = 25; //If the difference is above this value, it is considered big enough to choose the better option
     private final int WORSTMOVEMIN = -10; //If we have 2 bad moves, provided one of them is above this value, we will still choose it
 
+    boolean hashMapFileExists;
+
     public RedAI() {
         currentMoves = new ArrayList<>();
         allMoves = new HashMap<>();
+
+        //Read from the txt file if it exists
+        //Each line represents a key value pair, the key and the value seperated by a single whitespace
+        try {
+            File myObj = new File("redMap.txt");
+            Scanner myReader = new Scanner(myObj);
+            
+            while (myReader.hasNextLine()) {
+                String data = myReader.nextLine();
+                String[] pair = data.split(" ");
+                
+                allMoves.put(Integer.parseInt(pair[0]), Integer.parseInt(pair[1]));
+
+            }
+            myReader.close();
+            hashMapFileExists = true;
+        } 
+          
+        //Doesnt exist, thats not a problem, just set the flag accordingly
+        catch (FileNotFoundException e) {
+            hashMapFileExists = false;
+        }
+
     }
 
     /**
@@ -174,5 +204,12 @@ public class RedAI {
     public static int randomMove() {
         Random numGen = new Random();
         return numGen.nextInt(5) + 1;
+    }
+
+    /**
+     * Must be called when the game ends, saves the updated hashmap into the txt file
+     */
+    public static void endGame() {
+
     }
 }
