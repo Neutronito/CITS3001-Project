@@ -453,7 +453,7 @@ public class Game {
     public double handleMessagePotency(int messagePotency) {
         //Error handling
         if (messagePotency <= 0 || messagePotency > 6) {
-            throw new IllegalArgumentException("Error, the message potency must be within the range 0 to 5 inclusively.");
+            throw new IllegalArgumentException("Error, the message potency must be within the range 1 to 6 inclusively.");
         }
 
         /*
