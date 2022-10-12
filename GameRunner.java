@@ -137,9 +137,8 @@ public class GameRunner {
             
                 //Execute the red rewards
                 int redGain = distribution[0] - beforeTurnDistribution[0];
-                int reward = redGain / (distribution[0] + distribution[1]) * 100;
+                int reward = (int)((double)(redGain) / (double)(distribution[0] + distribution[1]) * 100.0);
                 int mapHash = gameInstance.hashBoardState();
-
                 redAI.updateRewards(reward, mapHash, redMove);
             }
             
@@ -200,6 +199,10 @@ public class GameRunner {
             displayEndGraphs();
         }
         displayGreenNetwork();
+
+        //store AI hashmaps
+        redAI.endGame();
+
         scanner.close();
         return 0;
     }
