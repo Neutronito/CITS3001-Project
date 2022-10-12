@@ -10,18 +10,18 @@ public class GameRunner {
     private boolean playAsRedAI;            // True if Red AI is playing, false otherwise
     private boolean playAsBlueAI;           // True if Blue AI is playing, false otherwise
     private final int maxIterations = 40;   // Maximum number of game simulations
-    private final String[][] redMessages =  {   {"1 version 1", "1 version 2"},
-                                                {"2 version 1", "2 version 2"},
-                                                {"3 version 1", "3 version 2"},
-                                                {"4 version 1", "4 version 2"},
-                                                {"5 version 1", "5 version 2"},
-                                                {"6 version 1", "6 version 2"}   };
-    private final String[][] blueMessages = {   {"1 version 1", "1 version 2"},
-                                                {"2 version 1", "2 version 2"},
-                                                {"3 version 1", "3 version 2"},
-                                                {"4 version 1", "4 version 2"},
-                                                {"5 version 1", "5 version 2"},
-                                                {"6 version 1", "6 version 2"}   };
+    private final String[][] redMessages =  {   {"1 potency", "1 potency"},
+                                                {"2 potency", "2 potency"},
+                                                {"3 potency", "3 potency"},
+                                                {"4 potency", "4 potency"},
+                                                {"5 potency", "5 potency"},
+                                                {"6 potency", "6 potency"}   };
+    private final String[][] blueMessages = {   {"1 potency", "1 potency"},
+                                                {"2 potency", "2 potency"},
+                                                {"3 potency", "3 potency"},
+                                                {"4 potency", "4 potency"},
+                                                {"5 potency", "5 potency"},
+                                                {"6 potency", "6 potency"}   };
 
     private boolean displayGreenGraph;
     private boolean displayEndGraphs;
@@ -253,6 +253,7 @@ public class GameRunner {
                 System.out.printf("Blue AI chose Option %d and Potency %d.\n", blueOption, bluePotency);
             } else {
                 bluePotency = getMessagePotency("blue");
+                System.out.printf("Blue Agent chose Option %d and Potency %d.\n", blueOption, bluePotency);
             }
             gameInstance.executeBlueTurn1(bluePotency, false);
         } 
@@ -271,7 +272,7 @@ public class GameRunner {
         Scanner scanner = new Scanner(System.in);
         String userChoice = "blank";
         while (!correctOptionInputFormat(userChoice)) {
-            System.out.println("Choose your action, 1 or 2.");
+            System.out.println("\nChoose your action, 1 or 2.");
             System.out.println("Option 1 : Interact with Green team.");
             System.out.println("Option 2 : Let a Grey agent in the Green network.");
             userChoice = scanner.nextLine();

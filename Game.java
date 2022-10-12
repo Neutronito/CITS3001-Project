@@ -434,7 +434,7 @@ public class Game {
         GreyAgent greyAgent = greyAgentsList[greyAgentIndex];
         int messagePotency = greyAgent.chooseMessage();
         System.out.printf("\nGrey Agent %d chosen is from %s team.\n", greyAgentIndex, greyAgent.getBlueTeamStatus() ? "blue" : "red");
-
+        System.out.printf("\nGrey Agent chose Potency %d.\n", messagePotency);
         //Grey Agent is on the blue team
         if (greyAgent.getBlueTeamStatus()) {
             executeBlueTurn1(messagePotency, true);
