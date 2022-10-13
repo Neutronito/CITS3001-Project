@@ -818,14 +818,13 @@ public class Game {
      * First number shows red voting, second number shows blue voting, third number shows red follower proportion
      * @return The hash of the current board state for red AI
      */
-    public int redHashBoardState() {
+    public String redHashBoardState() {
         int[] votingNumbers = getVotingOpinions();
         int redVoting = votingNumbers[0];
         int blueVoting = votingNumbers[1];
         int redFollowers = (int) (getRedFollowers() / greenAgentCount * 100);
         String hashBuilder = Integer.toString(redVoting) + Integer.toString(blueVoting) + Integer.toString(redFollowers);
-        int hashInteger = Integer.parseInt(hashBuilder);
-        return hashInteger;
+        return hashBuilder;
     }
 
     /**
@@ -833,13 +832,12 @@ public class Game {
      * First number shows blue voting, second number shows red voting, third number shows blue energy
      * @return The hash of the current board state for blue AI
      */
-    public int blueHashBoardState() {
+    public String blueHashBoardState() {
         int[] votingNumbers = getVotingOpinions();
         int redVoting = votingNumbers[0];
         int blueVoting = votingNumbers[1];
         int blueEnergyInt = (int) getBlueEnergyLevel();
         String hashBuilder = Integer.toString(blueVoting) + Integer.toString(redVoting) + Integer.toString(blueEnergyInt);
-        int hashInteger = Integer.parseInt(hashBuilder);
-        return hashInteger;
+        return hashBuilder;
     }
 }

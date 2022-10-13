@@ -15,11 +15,11 @@ import java.io.FileWriter;
 public class RedAI {
 
     //First index is the map hash, the second index is the move the AI did and the third is the reward
-    private ArrayList<Integer[]> currentMoves;
+    private ArrayList<String[]> currentMoves;
 
     //Stores all moves the AI has done, and their rewards
     //The first digit is the move, and the next left digits are the reward from -100 to 100
-    private HashMap<Integer, Integer> allMoves;
+    private HashMap<String, Integer> allMoves;
 
     //Tuning Parameters for the AI
     private final int EXPLORATIONRATE = 30; //30%, so 0.3 chance of doing a random explore move instead of exploitation
@@ -40,7 +40,7 @@ public class RedAI {
                 String data = myReader.nextLine();
                 String[] pair = data.split(" ");
                 
-                allMoves.put(Integer.parseInt(pair[0]), Integer.parseInt(pair[1]));
+                allMoves.put(pair[0], Integer.parseInt(pair[1]));
             }
             myReader.close();
         } 
@@ -60,7 +60,7 @@ public class RedAI {
      * Exectues reinforcement learning to decide the move to play at this current point in the game
      * @return The message potency to play
      */
-    public int chooseMessagePotency(int currentGameHash) {
+    public int chooseMessagePotency(String currentGameHash) {
         Random numGen = new Random();
         //generate random number to see which method we use
         int randInt = numGen.nextInt(100);
@@ -83,18 +83,18 @@ public class RedAI {
                 //We have a good move to consider
                 if (reward > 0) {
                     //We will see if the move we did in the past was any good
-                    Integer previousMove[];
+                    String previousMove[];
 
                     if (!currentMoves.isEmpty()) {
                         previousMove = currentMoves.get(currentMoves.size() - 1);
                     } 
                     //If no previous move exists, fill it with this placeholder 
                     else {
-                        Integer newInt[] = {0, 0, -100}; 
+                        String newInt[] = {"0", "0", "-100"}; 
                         previousMove = newInt;
                     }
-                    int previousPotency = previousMove[1];
-                    int previousReward = previousMove[2];
+                    int previousPotency = Integer.parseInt(previousMove[1]);
+                    int previousReward = Integer.parseInt(previousMove[2]);
 
                     //If one move is obviously better than the other, just take it
                     int rewardDifference = Math.abs(previousReward - reward);
@@ -117,15 +117,15 @@ public class RedAI {
                 //The reward is poor, so the move we did back then wasn't very good
                 else {
                     //We will see if the move we did in the past was any good
-                    Integer previousMove[];
+                    String previousMove[];
                     if (!currentMoves.isEmpty()) {
                         previousMove = currentMoves.get(currentMoves.size() - 1);
                     } else {
-                        Integer newInt[] = {0, 0, -100}; 
+                        String newInt[] = {"0", "0", "-100"}; 
                         previousMove = newInt;
                     }
-                    int previousPotency = previousMove[1];
-                    int previousReward = previousMove[2];
+                    int previousPotency = Integer.parseInt(previousMove[1]);
+                    int previousReward = Integer.parseInt(previousMove[2]);
 
                     //The previous move was at the very least ok, so we will do it again
                     if (previousReward > 0) {
@@ -152,15 +152,15 @@ public class RedAI {
             }
             //There is no move in our map, if our last move was good use it, else try a new move that wasn't the last move
             else {
-                Integer previousMove[];
-                if (!currentMoves.isEmpty()) {
-                    previousMove = currentMoves.get(currentMoves.size() - 1);
-                } else {
-                    Integer newInt[] = {0, 0, -100}; 
-                    previousMove = newInt;
-                }
-                int previousPotency = previousMove[1];
-                int previousReward = previousMove[2];
+                String previousMove[];
+                    if (!currentMoves.isEmpty()) {
+                        previousMove = currentMoves.get(currentMoves.size() - 1);
+                    } else {
+                        String newInt[] = {"0", "0", "-100"}; 
+                        previousMove = newInt;
+                    }
+                    int previousPotency = Integer.parseInt(previousMove[1]);
+                    int previousReward = Integer.parseInt(previousMove[2]);
 
                 //The previous move was good
                 if (previousReward > 0) {
@@ -179,12 +179,12 @@ public class RedAI {
           
     }
 
-    public void updateRewards(int reward, int mapHash, int previousMove) {
+    public void updateRewards(int reward, String mapHash, int previousMove) {
         //Store this move in our previous moves array
-        Integer[] playedMove = new Integer[3];
+        String[] playedMove = new String[3];
         playedMove[0] = mapHash;
-        playedMove[1] = previousMove;
-        playedMove[2] = reward;
+        playedMove[1] = Integer.toString(previousMove);
+        playedMove[2] = Integer.toString(reward);
         
         currentMoves.add(playedMove);
 
@@ -235,8 +235,8 @@ public class RedAI {
 
             //Loop through the hashmap, writing it into the file
             //Each line represents a key value pair, the key and the value seperated by a single whitespace, respectively
-            for (HashMap.Entry<Integer, Integer> entry : allMoves.entrySet()){
-                fileWriter.write(Integer.toString(entry.getKey()) + " " + Integer.toString(entry.getValue()) + "\n");
+            for (HashMap.Entry<String, Integer> entry : allMoves.entrySet()){
+                fileWriter.write(entry.getKey() + " " + Integer.toString(entry.getValue()) + "\n");
             }
         } 
         catch (IOException iOException) {
