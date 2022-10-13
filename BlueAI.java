@@ -124,13 +124,9 @@ public class BlueAI {
                 else if (reward > WORSTMOVEMIN) {
                     return option;
                 }
-                //They are both terrible moves, so just return a random move that isnt either of those two
+                //They are both terrible moves, so just return a random move
                 else {
-                    int moveToDo = previousOption;
-                    while (moveToDo == previousOption || moveToDo == option) {
-                        moveToDo = randomOptionMove();
-                    }
-                    return moveToDo;
+                    return randomOptionMove();
                 }
             }
         }
