@@ -670,6 +670,15 @@ public class Game {
     }
 
     /**
+     * Getter for the red agent follower count
+     * WARNING, returns a shallow copy so use with care
+     * @return The red follower count
+     */
+    public int getRedFollowers() {
+        return redAgent.getFollowerCount();
+    }
+
+    /**
      * Getter for green network as a formatted array
      * Used for feeding into python script, rightmost digit is voting opinion, 1 being voting and 0 being not voting. The remaining digits represent a floored value of the uncertainty * 10, so -8.79879 would be -8
      * @return An array but formatted as a string
@@ -805,11 +814,32 @@ public class Game {
     }
 
     /**
-     * Hashes the current board state, to be stored in the hashmap of the AIs 
-     * @return The hash, right four digits show the number voting, and the next left four show the number not voting
+     * Hashes the current board state, to be stored in the hashmap of the red AI 
+     * First number shows red voting, second number shows blue voting, third number shows red follower proportion
+     * @return The hash of the current board state for red AI
      */
-    public int hashBoardState() {
+    public int redHashBoardState() {
         int[] votingNumbers = getVotingOpinions();
-        return votingNumbers[1] + votingNumbers[0] * 10000;
+        int redVoting = votingNumbers[0];
+        int blueVoting = votingNumbers[1];
+        int redFollowers = (int) (getRedFollowers() / greenAgentCount * 100);
+        String hashBuilder = Integer.toString(redVoting) + Integer.toString(blueVoting) + Integer.toString(redFollowers);
+        int hashInteger = Integer.parseInt(hashBuilder);
+        return hashInteger;
+    }
+
+    /**
+     * Hashes the current board state, to be stored in the hashmap of the blue AI 
+     * First number shows blue voting, second number shows red voting, third number shows blue energy
+     * @return The hash of the current board state for blue AI
+     */
+    public int blueHashBoardState() {
+        int[] votingNumbers = getVotingOpinions();
+        int redVoting = votingNumbers[0];
+        int blueVoting = votingNumbers[1];
+        int blueEnergyInt = (int) getBlueEnergyLevel();
+        String hashBuilder = Integer.toString(blueVoting) + Integer.toString(redVoting) + Integer.toString(blueEnergyInt);
+        int hashInteger = Integer.parseInt(hashBuilder);
+        return hashInteger;
     }
 }

@@ -137,7 +137,7 @@ public class GameRunner {
                 //Execute the red rewards
                 int redGain = distribution[0] - beforeTurnDistribution[0];
                 int reward = (int)((double)(redGain) / (double)(distribution[0] + distribution[1]) * 100.0);
-                int mapHash = gameInstance.hashBoardState();
+                int mapHash = gameInstance.redHashBoardState();
                 redAI.updateRewards(reward, mapHash, redMove);
             }
 
@@ -147,12 +147,12 @@ public class GameRunner {
                 //Execute the red rewards
                 int blueGain = distribution[1] - beforeTurnDistribution[1];
                 int reward = (int)((double)(blueGain) / (double)(distribution[0] + distribution[1]) * 100.0);
-                int mapHash = gameInstance.hashBoardState();
+                int mapHash = gameInstance.blueHashBoardState();
                 blueAI.updateRewards(reward, mapHash, redMove);
             }
             
             //Print the metrics now
-            gameInstance.printGreenAgents();
+            // gameInstance.printGreenAgents();
             gameInstance.printGreenStatistics();
             gameInstance.printBlueEnergyLevel();
             gameInstance.printRedFollowerCount();
@@ -226,7 +226,7 @@ public class GameRunner {
 
         //If red AI is playing
         if (playAsRedAI) {
-            int mapHash = gameInstance.hashBoardState();
+            int mapHash = gameInstance.redHashBoardState();
             redPotency = redAI.chooseMessagePotency(mapHash);
         }
         //If user is playing
@@ -264,7 +264,7 @@ public class GameRunner {
         //If option 1 is chosen - interact with all green agents.
         if (blueOption == 1) {
             if (playAsBlueAI) {
-                int mapHash = gameInstance.hashBoardState();
+                int mapHash = gameInstance.blueHashBoardState();
                 bluePotency = blueAI.chooseMessagePotency(mapHash);
                 System.out.printf("Blue AI chose Option %d and Potency %d.\n", blueOption, bluePotency);
             } else {
