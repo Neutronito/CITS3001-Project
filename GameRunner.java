@@ -148,7 +148,7 @@ public class GameRunner {
                 int blueGain = distribution[1] - beforeTurnDistribution[1];
                 int reward = (int)((double)(blueGain) / (double)(distribution[0] + distribution[1]) * 100.0);
                 String mapHash = gameInstance.blueHashBoardState();
-                blueAI.updateRewards(reward, mapHash, redMove);
+                blueAI.updateRewards(reward, mapHash, blueMove);
             }
             
             //Print the metrics now

@@ -6,8 +6,6 @@ import java.io.File;
 import java.io.FileNotFoundException; 
 import java.util.Scanner;
 
-import javax.management.ValueExp;
-
 import java.nio.file.*;
 import java.io.IOException;
 import java.io.FileWriter;
@@ -82,19 +80,8 @@ public class RedAI {
                 int potency = Math.abs(mapValue) % 10;
                 //We have a good move to consider
                 if (reward > 0) {
-                    //We will see if the move we did in the past was any good
-                    String previousMove[];
-
-                    if (!currentMoves.isEmpty()) {
-                        previousMove = currentMoves.get(currentMoves.size() - 1);
-                    } 
-                    //If no previous move exists, fill it with this placeholder 
-                    else {
-                        String newInt[] = {"0", "0", "-100"}; 
-                        previousMove = newInt;
-                    }
-                    int previousPotency = Integer.parseInt(previousMove[1]);
-                    int previousReward = Integer.parseInt(previousMove[2]);
+                    int previousPotency = getPreviousMove()[0];
+                    int previousReward = getPreviousMove()[1];
 
                     //If one move is obviously better than the other, just take it
                     int rewardDifference = Math.abs(previousReward - reward);
@@ -117,15 +104,8 @@ public class RedAI {
                 //The reward is poor, so the move we did back then wasn't very good
                 else {
                     //We will see if the move we did in the past was any good
-                    String previousMove[];
-                    if (!currentMoves.isEmpty()) {
-                        previousMove = currentMoves.get(currentMoves.size() - 1);
-                    } else {
-                        String newInt[] = {"0", "0", "-100"}; 
-                        previousMove = newInt;
-                    }
-                    int previousPotency = Integer.parseInt(previousMove[1]);
-                    int previousReward = Integer.parseInt(previousMove[2]);
+                    int previousPotency = getPreviousMove()[0];
+                    int previousReward = getPreviousMove()[1];
 
                     //The previous move was at the very least ok, so we will do it again
                     if (previousReward > 0) {
@@ -152,15 +132,8 @@ public class RedAI {
             }
             //There is no move in our map, if our last move was good use it, else try a new move that wasn't the last move
             else {
-                String previousMove[];
-                    if (!currentMoves.isEmpty()) {
-                        previousMove = currentMoves.get(currentMoves.size() - 1);
-                    } else {
-                        String newInt[] = {"0", "0", "-100"}; 
-                        previousMove = newInt;
-                    }
-                    int previousPotency = Integer.parseInt(previousMove[1]);
-                    int previousReward = Integer.parseInt(previousMove[2]);
+                int previousPotency = getPreviousMove()[0];
+                int previousReward = getPreviousMove()[1];
 
                 //The previous move was good
                 if (previousReward > 0) {
@@ -176,7 +149,23 @@ public class RedAI {
                 }
             }
         }
-          
+    }
+
+    public int[] getPreviousMove() {
+        //We will see if the move we did in the past was any good
+        String previousMove[];
+        if (!currentMoves.isEmpty()) {
+            previousMove = currentMoves.get(currentMoves.size() - 1);
+        } 
+        //If no previous move exists, fill it with this placeholder 
+        else {
+            String newInt[] = {"0", "0", "-100"}; 
+            previousMove = newInt;
+        }
+        int previousPotency = Integer.parseInt(previousMove[1]);
+        int previousReward = Integer.parseInt(previousMove[2]);
+        int[] output = {previousPotency, previousReward};
+        return output;
     }
 
     public void updateRewards(int reward, String mapHash, int previousMove) {
