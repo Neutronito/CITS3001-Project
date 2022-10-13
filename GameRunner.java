@@ -125,7 +125,8 @@ public class GameRunner {
             int redMove = playRedTurn();
 
             //Execute the blue turn
-            int blueMove = playBlueTurn();
+            int blueOption = playBlueTurn();
+            int bluePotency = playBluePotency(blueOption);
             
             //Execute the green turn
             System.out.println("\nGREEN TEAM");
@@ -148,7 +149,7 @@ public class GameRunner {
                 int blueGain = distribution[1] - beforeTurnDistribution[1];
                 int reward = (int)((double)(blueGain) / (double)(distribution[0] + distribution[1]) * 100.0);
                 String mapHash = gameInstance.blueHashBoardState();
-                blueAI.updateRewards(reward, mapHash, blueMove);
+                blueAI.updateRewards(reward, mapHash, bluePotency, blueOption);
             }
             
             //Print the metrics now
@@ -239,28 +240,33 @@ public class GameRunner {
         return redPotency;
     }
 
-    /*
-     * TODO : Blue AI Option
-     */
     /**
-     * Executes the Blue agent turn, depending on whether user or AI is playing.
+     * Executes the Blue agent turn to choose option, depending on whether user or AI is playing.
+     * @return The option blue played
      */
     public int playBlueTurn() {
-        int blueOption, bluePotency;
+        int blueOption;
         System.out.println("\nBLUE AGENT'S TURN");
 
         //If blue AI is playing
         if (playAsBlueAI) {
-            blueOption = blueAI.chooseBlueOption();
-            // blueOption = blueAI.chooseBlueOption(gameInstance.hasMoreCertainVoters(), gameInstance.getBlueEnergyLevel(), gameInstance.getProportionCertain());
+            String mapHash = gameInstance.blueHashBoardState();
+            blueOption = blueAI.chooseBlueOption(mapHash);
         } 
         //If user is playing
         else {
             blueOption = getBlueOption();
         }
-        
-        bluePotency = 1; // FIX THIS
 
+        return blueOption;
+    }
+
+    /**
+     * Executes the Blue agent turn to choose potency message, depending on whether user or AI is playing.
+     * @return The potency value blue played
+     */
+    public int playBluePotency(int blueOption) {
+        int bluePotency;
         //If option 1 is chosen - interact with all green agents.
         if (blueOption == 1) {
             if (playAsBlueAI) {
@@ -276,9 +282,10 @@ public class GameRunner {
         //If option 2 is chosen - let grey agent into green network.
         else if (blueOption == 2) {
             System.out.printf("Blue Agent chose Option %d.\n", blueOption);
-            gameInstance.executeBlueTurn2();
+            bluePotency = gameInstance.executeBlueTurn2();
+        } else {
+            throw new IllegalArgumentException("Error, the blue option must be either 1 or 2.");
         }
-
         return bluePotency;
     }
 

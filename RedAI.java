@@ -47,15 +47,18 @@ public class RedAI {
         catch (FileNotFoundException e) {
         }
     }
-
-    //Returns a random number from 1 to 6
+    
+    /**
+     * Returns a random number from 1 to 6
+     * @return a random number from 1 to 6
+     */
     public static int randomMove() {
         Random numGen = new Random();
         return numGen.nextInt(5) + 1;
     }
 
     /**
-     * Exectues reinforcement learning to decide the move to play at this current point in the game
+     * Exectues reinforcement learning to decide the potency to play at this current point in the game
      * @return The message potency to play
      */
     public int chooseMessagePotency(String currentGameHash) {
@@ -75,7 +78,6 @@ public class RedAI {
 
             //We have a past move we can use
             if (mapValue != null) {
-                
                 int reward = mapValue / 10;
                 int potency = Math.abs(mapValue) % 10;
                 //We have a good move to consider
@@ -128,7 +130,6 @@ public class RedAI {
                         return moveToDo;
                     }
                 }
-
             }
             //There is no move in our map, if our last move was good use it, else try a new move that wasn't the last move
             else {
@@ -142,15 +143,19 @@ public class RedAI {
                 //The previous move was bad, so pick a random one
                 else {
                     int moveToDo = previousPotency;
-                        while (moveToDo == previousPotency) {
-                            moveToDo = randomMove();
-                        }
-                        return moveToDo;
+                    while (moveToDo == previousPotency) {
+                        moveToDo = randomMove();
+                    }
+                    return moveToDo;
                 }
             }
         }
     }
 
+    /**
+     * Get the previous move and its corresponding reward
+     * @return An array containing the previous move and its corresponding reward
+     */
     public int[] getPreviousMove() {
         //We will see if the move we did in the past was any good
         String previousMove[];
@@ -168,6 +173,12 @@ public class RedAI {
         return output;
     }
 
+    /**
+     * Updates the allMoves with the current hash state and its corresponding reward
+     * @param reward The reward for current hash state
+     * @param mapHash The current hash state
+     * @param previousPotency The previous move played
+     */
     public void updateRewards(int reward, String mapHash, int previousMove) {
         //Store this move in our previous moves array
         String[] playedMove = new String[3];
@@ -199,7 +210,6 @@ public class RedAI {
                 allMoves.put(mapHash, hashValue);
             } 
         }
-
     }
 
     /**
