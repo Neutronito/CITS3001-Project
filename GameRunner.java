@@ -25,6 +25,7 @@ public class GameRunner {
 
     private boolean displayGreenGraph;
     private boolean displayEndGraphs;
+    private boolean displayNetwork;
 
     private ArrayList<Integer> votingForRedList;
     private ArrayList<Integer> votingForBlueList;
@@ -47,9 +48,6 @@ public class GameRunner {
         redAI = new RedAI();    //Creates red AI
         blueAI = new BlueAI();  //Creates blue AI
         
-        displayGreenGraph = getOption("\nDo you wish to see the green network graph for each round?\nPlease type in y for yes or n for no.");
-        displayEndGraphs = getOption("\nDo you wish to see the graph of voting opinions and average uncertainty over time at the end of the game?\nPlease type in y for yes or n for no.");
-
         if (displayEndGraphs) {
             //init the arraylist and record the numbers currently voting
             votingForRedList = new ArrayList<>();
@@ -78,6 +76,26 @@ public class GameRunner {
      */
     public Scanner getScanner() {
         return scanner;
+    }
+
+    /**
+     * Initialise variables to run the game automatically.
+     */
+    public void setPlayAsAI() {
+        playAsRedAI = true;
+        playAsBlueAI = true;
+        displayGreenGraph = false;
+        displayEndGraphs = false;
+        displayNetwork = false;
+    }
+
+    /**
+     * Initialise visualisation variables.
+     */
+    public void setDisplays(boolean displayGreenGraph, boolean displayEndGraphs, boolean displayNetwork) {
+        this.displayGreenGraph = displayGreenGraph;
+        this.displayEndGraphs = displayEndGraphs;
+        this.displayNetwork = displayNetwork;
     }
 
     /**
@@ -120,7 +138,11 @@ public class GameRunner {
         int numIterations = 0;
         gameInstance.printGreenAgents();
         gameInstance.printGreenStatistics();
-        // displayGreenNetwork();
+
+        if (displayNetwork) {
+            displayNetworks();
+        }
+        
         Scanner scanner = getScanner();
         //True when game end is triggered, false when game is running
         boolean triggerGameEnd = false;         
@@ -215,6 +237,10 @@ public class GameRunner {
 
         if (displayEndGraphs) {
             displayEndGraphs();
+        }
+
+        if (displayNetwork) {
+            displayNetworks();
         }
 
         //store AI hashmaps
@@ -497,7 +523,7 @@ public class GameRunner {
     /**
      * Displays the network graphs for green and grey agents.
      */
-    public void displayGreenNetwork() {
+    public void displayNetworks() {
         //Get the paramString for Green Network
         String networkParam = "";
         ArrayList<String> fromNodes = new ArrayList<>();
@@ -548,10 +574,25 @@ public class GameRunner {
     public static void main(String[] args) {
         double[] uncertaintyInterval = {-1.0, 0.4};
         GameRunner curRunner = new GameRunner(40, 0.4, 10, 40.0, uncertaintyInterval, 60.0);
-        //Ask user if red agent is played by user or AI
-        curRunner.playAsUser("red");
-        //Ask user if blue agent is played by user or AI
-        curRunner.playAsUser("blue");
+        
+        // Silent mode
+        if (args[0].equals("-s")) {
+            curRunner.setPlayAsAI();
+        } 
+        // Interactive mode
+        else {
+            // Ask user for visualisation options
+            boolean displayGreenGraph = curRunner.getOption("\nDo you wish to see the green network graph for each round?\nPlease type in y for yes or n for no.");
+            boolean displayEndGraphs = curRunner.getOption("\nDo you wish to see the graph of voting opinions and average uncertainty over time at the end of the game?\nPlease type in y for yes or n for no.");
+            boolean displayNetwork = curRunner.getOption("\nDo you wish to see the network graphs for green and grey agents?\nPlease type in y for yes or n for no.");
+            curRunner. setDisplays(displayGreenGraph, displayEndGraphs, displayNetwork);
+            
+            // Ask user if red agent is played by user or AI
+            curRunner.playAsUser("red");
+            // Ask user if blue agent is played by user or AI
+            curRunner.playAsUser("blue");
+        }
+       
         curRunner.playGame();
     }
 }
