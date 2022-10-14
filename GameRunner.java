@@ -101,6 +101,7 @@ public class GameRunner {
             playAsBlueAI = playAsAI;
         }
     }
+
     /**
      * A blocking function that executes the game, waiting for human inputs for the red turn. The red turn is executed before the green turn
      * Prints the game statistics after each turn.
@@ -153,7 +154,7 @@ public class GameRunner {
             }
             
             //Print the metrics now
-            // gameInstance.printGreenAgents();
+            gameInstance.printGreenAgents();
             gameInstance.printGreenStatistics();
             gameInstance.printBlueEnergyLevel();
             gameInstance.printRedFollowerCount();
@@ -207,7 +208,6 @@ public class GameRunner {
         if (displayEndGraphs) {
             displayEndGraphs();
         }
-        // displayGreenNetwork();
 
         //store AI hashmaps
         redAI.endGame();
@@ -313,7 +313,7 @@ public class GameRunner {
      * @return The message potency level.
      */
     public int getMessagePotency(String team) {
-        
+
         Random rand = new Random();
         Scanner scanner = new Scanner(System.in);
         String userInput = "blank";
@@ -404,11 +404,11 @@ public class GameRunner {
         }  
       }
 
-      /**
-       * Asks the user for input and returns true or false whether they put in y or n
-       * @param requestString The message to send the user before asking them to fill in the input
-       * @return true if y was input or false if n was input
-       */
+    /**
+     * Asks the user for input and returns true or false whether they put in y or n
+     * @param requestString The message to send the user before asking them to fill in the input
+     * @return true if y was input or false if n was input
+     */
     public boolean getOption(String requestString) {
         String userChoice = "blank";
         
@@ -486,6 +486,9 @@ public class GameRunner {
         }  
     }
 
+    /**
+     * Displays the network graphs for green and grey agents.
+     */
     public void displayGreenNetwork() {
         //Get the paramString for Green Network
         String networkParam = "";
@@ -512,7 +515,7 @@ public class GameRunner {
         //Get the paramString for Green agent's opinion
         String teamParam = "";
         ArrayList<String> greenAgent = new ArrayList<>();
-        String greenTeam  = gameInstance.getGreenTeams();
+        String greenTeam  = gameInstance.getFormattedGreenTeams();
         for (int i = 0; i < greenAgentCount; i++) {
             greenAgent.add(Integer.toString(i));
         }
@@ -522,7 +525,7 @@ public class GameRunner {
         teamParam = greenAgentString + "|" + greenTeam;
 
         //Print Green Network
-        ProcessBuilder processBuilder = new ProcessBuilder("python", "./graphs/networkGrapher.py", networkParam, teamParam, gameInstance.getGreyTeams());
+        ProcessBuilder processBuilder = new ProcessBuilder("python", "./graphs/networkGrapher.py", networkParam, teamParam, gameInstance.getFormattedGreyTeams());
         processBuilder.redirectErrorStream(true);
         try {
             Process process = processBuilder.start();

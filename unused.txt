@@ -1,0 +1,70 @@
+Unused Functions in Game.java
+
+    /**
+     * Returns an array with a count of certain green agents with opinion 'vote' and 'not vote'.
+     * @return an array with a count of certain green agents with opinion 'vote' and 'not vote'.
+     */
+    public int[] getCertainVotersCount() {
+        int greenYes = 0;   //Number of green agents who ARE voting with uncertainty less than 0
+        int greenNo = 0;    //Number of green agents who ARE NOT voting with uncertainty less than 0
+        for (int i = 0; i < greenAgentCount; i++) {
+            //Increment the voting counter
+            if (greenAgentsList[i].getVotingOpinion() && greenAgentsList[i].getUncertainty() < 0) {
+                greenYes++;
+            }
+            if (!greenAgentsList[i].getVotingOpinion() && greenAgentsList[i].getUncertainty() < 0) {
+                greenNo++;
+            }
+        }
+        int[] output = {greenYes, greenNo};
+        return output;
+    }
+
+    /**
+     * Returns true if there are more certain green agents with opinion 'vote'.
+     * Returns false if there are more certain green agents with opinion 'not vote'.
+     * @return True if there are more certain green agents with opinion 'vote', false if there are more certain green agents with opinion 'not vote'.
+     */
+    public boolean hasMoreCertainVoters() {
+        int greenYes = 0;   //Number of green agents who ARE voting with uncertainty less than 0
+        int greenNo = 0;    //Number of green agents who ARE NOT voting with uncertainty less than 0
+        
+        for (int i = 0; i < greenAgentCount; i++) {
+            //Increment the voting counter
+            if (greenAgentsList[i].getVotingOpinion() && greenAgentsList[i].getUncertainty() < 0) {
+                greenYes++;
+            }
+            if (!greenAgentsList[i].getVotingOpinion() && greenAgentsList[i].getUncertainty() < 0) {
+                greenNo++;
+            }
+        }
+        return (greenYes > greenNo);
+    }
+
+    /**
+     * Returns the proportion of green agents with high certainty, 
+     * the proportion of certain green agents with opinion 'vote',
+     * the proportion of certain green agents with opinion 'not vote'.
+     * WARNING, returns a shallow copy so use with care
+     * @return The array containing proportion of certain grees, certain blues, and certain reds.
+     */
+    public double[] getProportionCertain() {
+        int certainGreens   = 0;
+        int certainBlues    = 0;
+        int certainReds     = 0;
+        for (GreenAgent curAgent : greenAgentsList) {
+            if (curAgent.getUncertainty() < 0) {
+                certainGreens++;
+                if (curAgent.getVotingOpinion()) {
+                    certainBlues++;
+                } else {
+                    certainReds++;
+                }
+            }
+        }
+        double proportionCertainGreens  = certainGreens / greenAgentCount;
+        double proportionCertainBlues   = certainBlues / greenAgentCount;
+        double proportionCertainReds    = certainReds / greenAgentCount;
+        double[] output = {proportionCertainGreens, proportionCertainBlues, proportionCertainReds};
+        return output;
+    }

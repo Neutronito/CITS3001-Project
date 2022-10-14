@@ -24,6 +24,9 @@ public class RedAI {
     private final int REWARDDIFFERENCE = 25; //If the difference is above this value, it is considered big enough to choose the better option
     private final int WORSTMOVEMIN = -10; //If we have 2 bad moves, provided one of them is above this value, we will still choose it
 
+    /**
+     * Constructor for the Red AI
+     */
     public RedAI() {
         currentMoves = new ArrayList<>();
         allMoves = new HashMap<>();

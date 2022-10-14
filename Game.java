@@ -487,6 +487,204 @@ public class Game {
     }
 
     /**
+     * Getter for the blue agent energy level
+     * WARNING, returns a shallow copy so use with care
+     * @return The blue energy level
+     */
+    public double getBlueEnergyLevel() {
+        return blueAgent.getEnergyLevel();
+    }
+
+    /**
+     * Getter for the red agent follower count
+     * WARNING, returns a shallow copy so use with care
+     * @return The red follower count
+     */
+    public int getRedFollowers() {
+        return redAgent.getFollowerCount();
+    }
+
+    /**
+     * Getter for the list of all the green agents list
+     * WARNING, returns a shallow copy so use with care
+     * @return The array containing all the green agents
+     */
+    public GreenAgent[] getGreenAgentsList() {
+        return greenAgentsList;
+    }
+
+    /**
+     * Getter for the adjacency matrix for the green network
+     * WARNING, returns a shallow copy so use with care
+     * @return The adjacency matrix for the green network
+     */
+    public double[][] getGreenNetwork() {
+        return greenNetwork;
+    }
+    
+    /**
+     * Getter for the average uncertainty of the entire newtork
+     * @param votingOpinion The voting opinion of the group to obtain the uncertainty off
+     * @return A double denoting the average uncertainty
+     */
+    public double getAverageUncertainty(boolean votingOpinion) {
+        double total = 0;
+        int count = 0;
+
+        for (GreenAgent curAgent : greenAgentsList) {
+            if (curAgent.getVotingOpinion() == votingOpinion) {
+                total += curAgent.getUncertainty();
+                count++;    
+            }
+        }
+
+        total /= (double)count;
+        return total;
+    }
+
+    /**
+     * Getter for the current voting opinions of the green network in the game
+     * @return voting opinion array, first index is red total and second index is green total
+     */
+    public int[] getVotingOpinions() {
+        int redTotal = 0;
+        int blueTotal = 0;
+
+        for (GreenAgent curAgent : greenAgentsList) {
+            if (curAgent.getVotingOpinion()) {
+                blueTotal++;
+            } else {
+                redTotal++;
+            }
+        }
+        
+        int[] output = {redTotal, blueTotal};
+        return output;
+    }
+
+    /**
+     * Getter for the current voting opinions of the green network in the game
+     * @param redList pushes the current amount voting for red onto this list
+     * @param blueList pushes the current amount voting for blue onto this list
+     */
+    public void getVotingOpinions(ArrayList<Integer> redList, ArrayList<Integer> blueList) {
+        int redTotal = 0;
+        int blueTotal = 0;
+
+        for (GreenAgent curAgent : greenAgentsList) {
+            if (curAgent.getVotingOpinion()) {
+                blueTotal++;
+            } else {
+                redTotal++;
+            }
+        }
+
+        redList.add(redTotal);
+        blueList.add(blueTotal);
+    }
+
+    /**
+     * Getter for green network as a formatted array
+     * Used for feeding into python script, rightmost digit is voting opinion, 1 being voting and 0 being not voting. The remaining digits represent a floored value of the uncertainty * 10, so -8.79879 would be -8
+     * @return An array but formatted as a string
+     */
+    public String getFormattedGreenViews() {
+        String returnString = "";
+
+        for (GreenAgent curAgent : greenAgentsList) {
+            
+            int votingOpinion = 0;
+            // Agent is voting
+            if (curAgent.getVotingOpinion()) {
+                votingOpinion = 1;
+            }
+
+            //Now process uncertainty
+            int flooredUncerainty = (int)Math.floor(curAgent.getUncertainty() * 10);
+
+            if (curAgent.getUncertainty() < 0) {
+                flooredUncerainty += 1;
+            }
+
+            flooredUncerainty *= 10;
+
+            if (flooredUncerainty < 0) {
+                flooredUncerainty -= votingOpinion;
+            } else {
+                flooredUncerainty += votingOpinion;
+            }
+
+           returnString += Integer.toString(flooredUncerainty);
+           returnString += ",";
+
+        }
+
+        return returnString.substring(0, returnString.length() - 1);
+    }  
+
+    /**
+     * Getter for the green agent's voting opinion as a string
+     * Used for feeding into python script
+     * @return A string denoting green agent's voting opinion
+     */
+    public String getFormattedGreenTeams() {
+        String greenTeams = "";
+        for (GreenAgent curAgent : greenAgentsList) {
+            if (curAgent.getVotingOpinion()) {
+                greenTeams += "1";
+            } else {
+                greenTeams += "0";
+            }
+        }
+        return greenTeams;
+    }
+
+    /**
+     * Getter for the grey agent's voting opinion as a string
+     * Used for feeding into python script
+     * @return A string denoting grey agent's voting opinion
+     */
+    public String getFormattedGreyTeams() {
+        String greyTeams = "";
+        for (GreyAgent curAgent : greyAgentsList) {
+            if (curAgent.getBlueTeamStatus()) {
+                greyTeams += "1";
+            } else {
+                greyTeams += "0";
+            }
+        }
+        return greyTeams;
+    }
+
+    /**
+     * Hashes the current board state, to be stored in the hashmap of the red AI 
+     * First number shows red voting, second number shows blue voting, third number shows red follower proportion
+     * @return The hash of the current board state for red AI
+     */
+    public String redHashBoardState() {
+        int[] votingNumbers = getVotingOpinions();
+        int redVoting = votingNumbers[0];
+        int blueVoting = votingNumbers[1];
+        int redFollowers = (int) (getRedFollowers() / greenAgentCount * 100);
+        String hashBuilder = Integer.toString(redVoting) + Integer.toString(blueVoting) + Integer.toString(redFollowers);
+        return hashBuilder;
+    }
+
+    /**
+     * Hashes the current board state, to be stored in the hashmap of the blue AI 
+     * First number shows blue voting, second number shows red voting, third number shows blue energy
+     * @return The hash of the current board state for blue AI
+     */
+    public String blueHashBoardState() {
+        int[] votingNumbers = getVotingOpinions();
+        int redVoting = votingNumbers[0];
+        int blueVoting = votingNumbers[1];
+        int blueEnergyInt = (int) getBlueEnergyLevel();
+        String hashBuilder = Integer.toString(blueVoting) + Integer.toString(redVoting) + Integer.toString(blueEnergyInt);
+        return hashBuilder;
+    }
+
+    /**
      * Print out the green network as an adjacency matrix with all the edge weights
      */
     public void printGreenNetwork() {
@@ -572,273 +770,5 @@ public class Game {
      */
     public void printRedFollowerCount() {
         System.out.println(String.format("Red Agent follower count is %d.", redAgent.getFollowerCount()));
-    }
-
-    /**
-     * Returns an array with a count of certain green agents with opinion 'vote' and 'not vote'.
-     * @return an array with a count of certain green agents with opinion 'vote' and 'not vote'.
-     */
-    public int[] getCertainVotersCount() {
-        int greenYes = 0;   //Number of green agents who ARE voting with uncertainty less than 0
-        int greenNo = 0;    //Number of green agents who ARE NOT voting with uncertainty less than 0
-        for (int i = 0; i < greenAgentCount; i++) {
-            //Increment the voting counter
-            if (greenAgentsList[i].getVotingOpinion() && greenAgentsList[i].getUncertainty() < 0) {
-                greenYes++;
-            }
-            if (!greenAgentsList[i].getVotingOpinion() && greenAgentsList[i].getUncertainty() < 0) {
-                greenNo++;
-            }
-        }
-        int[] output = {greenYes, greenNo};
-        return output;
-    }
-
-    /**
-     * Returns true if there are more certain green agents with opinion 'vote'.
-     * Returns false if there are more certain green agents with opinion 'not vote'.
-     * @return True if there are more certain green agents with opinion 'vote', false if there are more certain green agents with opinion 'not vote'.
-     */
-    public boolean hasMoreCertainVoters() {
-        int greenYes = 0;   //Number of green agents who ARE voting with uncertainty less than 0
-        int greenNo = 0;    //Number of green agents who ARE NOT voting with uncertainty less than 0
-        
-        for (int i = 0; i < greenAgentCount; i++) {
-            //Increment the voting counter
-            if (greenAgentsList[i].getVotingOpinion() && greenAgentsList[i].getUncertainty() < 0) {
-                greenYes++;
-            }
-            if (!greenAgentsList[i].getVotingOpinion() && greenAgentsList[i].getUncertainty() < 0) {
-                greenNo++;
-            }
-        }
-        return (greenYes > greenNo);
-    }
-
-    /**
-     * Getter for the list of all the green agents list
-     * WARNING, returns a shallow copy so use with care
-     * @return The array containing all the green agents
-     */
-    public GreenAgent[] getGreenAgentsList() {
-        return greenAgentsList;
-    }
-
-    /**
-     * Getter for the adjacency matrix for the green network
-     * WARNING, returns a shallow copy so use with care
-     * @return The adjacency matrix for the green network
-     */
-    public double[][] getGreenNetwork() {
-        return greenNetwork;
-    }
-
-    /**
-     * Returns the proportion of green agents with high certainty, 
-     * the proportion of certain green agents with opinion 'vote',
-     * the proportion of certain green agents with opinion 'not vote'.
-     * WARNING, returns a shallow copy so use with care
-     * @return The array containing proportion of certain grees, certain blues, and certain reds.
-     */
-    public double[] getProportionCertain() {
-        int certainGreens   = 0;
-        int certainBlues    = 0;
-        int certainReds     = 0;
-        for (GreenAgent curAgent : greenAgentsList) {
-            if (curAgent.getUncertainty() < 0) {
-                certainGreens++;
-                if (curAgent.getVotingOpinion()) {
-                    certainBlues++;
-                } else {
-                    certainReds++;
-                }
-            }
-        }
-        double proportionCertainGreens  = certainGreens / greenAgentCount;
-        double proportionCertainBlues   = certainBlues / greenAgentCount;
-        double proportionCertainReds    = certainReds / greenAgentCount;
-        double[] output = {proportionCertainGreens, proportionCertainBlues, proportionCertainReds};
-        return output;
-    }
-
-    /**
-     * Getter for the blue agent energy level
-     * WARNING, returns a shallow copy so use with care
-     * @return The blue energy level
-     */
-    public double getBlueEnergyLevel() {
-        return blueAgent.getEnergyLevel();
-    }
-
-    /**
-     * Getter for the red agent follower count
-     * WARNING, returns a shallow copy so use with care
-     * @return The red follower count
-     */
-    public int getRedFollowers() {
-        return redAgent.getFollowerCount();
-    }
-
-    /**
-     * Getter for green network as a formatted array
-     * Used for feeding into python script, rightmost digit is voting opinion, 1 being voting and 0 being not voting. The remaining digits represent a floored value of the uncertainty * 10, so -8.79879 would be -8
-     * @return An array but formatted as a string
-     */
-    public String getFormattedGreenViews() {
-        String returnString = "";
-
-        for (GreenAgent curAgent : greenAgentsList) {
-            
-            int votingOpinion = 0;
-            // Agent is voting
-            if (curAgent.getVotingOpinion()) {
-                votingOpinion = 1;
-            }
-
-            //Now process uncertainty
-            int flooredUncerainty = (int)Math.floor(curAgent.getUncertainty() * 10);
-
-            if (curAgent.getUncertainty() < 0) {
-                flooredUncerainty += 1;
-            }
-
-            flooredUncerainty *= 10;
-
-            if (flooredUncerainty < 0) {
-                flooredUncerainty -= votingOpinion;
-            } else {
-                flooredUncerainty += votingOpinion;
-            }
-
-           returnString += Integer.toString(flooredUncerainty);
-           returnString += ",";
-
-        }
-
-        return returnString.substring(0, returnString.length() - 1);
-    }  
-    
-    /**
-     * Getter for the average uncertainty of the entire newtork
-     * @param votingOpinion The voting opinion of the group to obtain the uncertainty off
-     * @return A double denoting the average uncertainty
-     */
-    public double getAverageUncertainty(boolean votingOpinion) {
-        double total = 0;
-        int count = 0;
-
-        for (GreenAgent curAgent : greenAgentsList) {
-            if (curAgent.getVotingOpinion() == votingOpinion) {
-                total += curAgent.getUncertainty();
-                count++;    
-            }
-        }
-
-        total /= (double)count;
-
-        return total;
-    }
-
-    /**
-     * Getter for the current voting opinions of the green network in the game
-     * @param redList pushes the current amount voting for red onto this list
-     * @param blueList pushes the current amount voting for blue onto this list
-     */
-    public void getVotingOpinions(ArrayList<Integer> redList, ArrayList<Integer> blueList) {
-        int redTotal = 0;
-        int blueTotal = 0;
-
-        for (GreenAgent curAgent : greenAgentsList) {
-            if (curAgent.getVotingOpinion()) {
-                blueTotal++;
-            } else {
-                redTotal++;
-            }
-        }
-
-        redList.add(redTotal);
-        blueList.add(blueTotal);
-    }
-
-    /**
-     * Getter for the current voting opinions of the green network in the game
-     * @return voting opinion array, first index is red total and second index is green total
-     */
-    public int[] getVotingOpinions() {
-        int redTotal = 0;
-        int blueTotal = 0;
-
-        for (GreenAgent curAgent : greenAgentsList) {
-            if (curAgent.getVotingOpinion()) {
-                blueTotal++;
-            } else {
-                redTotal++;
-            }
-        }
-        
-        int[] output = {redTotal, blueTotal};
-        return output;
-    }
-
-    /**
-     * Getter for the green agent's voting opinion as a string
-     * Used for feeding into python script
-     * @return A string denoting green agent's voting opinion
-     */
-    public String getGreenTeams() {
-        String greenTeams = "";
-        for (GreenAgent curAgent : greenAgentsList) {
-            if (curAgent.getVotingOpinion()) {
-                greenTeams += "1";
-            } else {
-                greenTeams += "0";
-            }
-        }
-        return greenTeams;
-    }
-
-    /**
-     * Getter for the grey agent's voting opinion as a string
-     * Used for feeding into python script
-     * @return A string denoting grey agent's voting opinion
-     */
-    public String getGreyTeams() {
-        String greyTeams = "";
-        for (GreyAgent curAgent : greyAgentsList) {
-            if (curAgent.getBlueTeamStatus()) {
-                greyTeams += "1";
-            } else {
-                greyTeams += "0";
-            }
-        }
-        return greyTeams;
-    }
-
-    /**
-     * Hashes the current board state, to be stored in the hashmap of the red AI 
-     * First number shows red voting, second number shows blue voting, third number shows red follower proportion
-     * @return The hash of the current board state for red AI
-     */
-    public String redHashBoardState() {
-        int[] votingNumbers = getVotingOpinions();
-        int redVoting = votingNumbers[0];
-        int blueVoting = votingNumbers[1];
-        int redFollowers = (int) (getRedFollowers() / greenAgentCount * 100);
-        String hashBuilder = Integer.toString(redVoting) + Integer.toString(blueVoting) + Integer.toString(redFollowers);
-        return hashBuilder;
-    }
-
-    /**
-     * Hashes the current board state, to be stored in the hashmap of the blue AI 
-     * First number shows blue voting, second number shows red voting, third number shows blue energy
-     * @return The hash of the current board state for blue AI
-     */
-    public String blueHashBoardState() {
-        int[] votingNumbers = getVotingOpinions();
-        int redVoting = votingNumbers[0];
-        int blueVoting = votingNumbers[1];
-        int blueEnergyInt = (int) getBlueEnergyLevel();
-        String hashBuilder = Integer.toString(blueVoting) + Integer.toString(redVoting) + Integer.toString(blueEnergyInt);
-        return hashBuilder;
     }
 }

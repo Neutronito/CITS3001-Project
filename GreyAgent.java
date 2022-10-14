@@ -28,6 +28,10 @@ public class GreyAgent {
         onBlueTeam = inputBlueTeamStatus;
     }
 
+    /**
+     * Randomly generates the level of potent message to be played by the grey agent
+     * @return the level of potent message
+     */
     public int chooseMessage() {
         Random levelGenerator = new Random();
         int messagePotency = levelGenerator.nextInt(6);
