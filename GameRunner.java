@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class GameRunner {
-
+    private Scanner scanner = new Scanner(System.in);
     private Game gameInstance;              // Game
     private RedAI redAI;                    // Red AI
     private BlueAI blueAI;                  // Blue AI
@@ -73,11 +73,19 @@ public class GameRunner {
     }
 
     /**
+     * Returns the scanner.
+     * @return The scanner
+     */
+    public Scanner getScanner() {
+        return scanner;
+    }
+
+    /**
      * Initialises whether the Red or Blue agent is played by a user or AI.
      * @param agent Red or Blue agent
      */
     public void playAsUser(String agent) {
-        Scanner scanner = new Scanner(System.in);
+        Scanner scanner = getScanner();
         System.out.printf("\n%s Agent : playing as user or AI?\n", agent.substring(0,1).toUpperCase() + agent.substring(1).toLowerCase());
         boolean playAsAI = false;
         boolean correctInput = false;
@@ -113,7 +121,7 @@ public class GameRunner {
         gameInstance.printGreenAgents();
         gameInstance.printGreenStatistics();
         // displayGreenNetwork();
-        Scanner scanner = new Scanner(System.in);
+        Scanner scanner = getScanner();
         //True when game end is triggered, false when game is running
         boolean triggerGameEnd = false;         
 
@@ -294,7 +302,7 @@ public class GameRunner {
      * @return The blue turn option.
      */
     public int getBlueOption() {
-        Scanner scanner = new Scanner(System.in);
+        Scanner scanner = getScanner();
         String userChoice = "blank";
         while (!correctOptionInputFormat(userChoice)) {
             System.out.println("\nChoose your action, 1 or 2.");
@@ -315,7 +323,7 @@ public class GameRunner {
     public int getMessagePotency(String team) {
 
         Random rand = new Random();
-        Scanner scanner = new Scanner(System.in);
+        Scanner scanner = getScanner();
         String userInput = "blank";
         String level1 = "", level2 = "", level3 = "", level4 = "", level5 = "", level6 = "";
 
@@ -414,7 +422,7 @@ public class GameRunner {
         
         System.out.println(requestString);
 
-        Scanner scanner = new Scanner(System.in);
+        Scanner scanner = getScanner();
 
         while (true) {
             userChoice = scanner.nextLine();
