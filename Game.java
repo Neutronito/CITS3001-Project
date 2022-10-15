@@ -310,11 +310,11 @@ public class Game {
                 greenAgent.setVotingOpinion(!greenAgent.getVotingOpinion());
                 
                 //Pick a random value to increase by based on the given range.
-                int range = (int)((FLIPUPPERBOUND - FLIPLOWERBOUND) * OPINIONSCALEFACTOR);
-                double increase = opinionGenerator.nextInt(range);
-                increase /= OPINIONSCALEFACTOR;
+                // int range = (int)((FLIPUPPERBOUND - FLIPLOWERBOUND) * OPINIONSCALEFACTOR);
+                // double increase = opinionGenerator.nextInt(range);
+                // increase /= OPINIONSCALEFACTOR;
 
-                greenAgent.setUncertainty(greenAgent.getUncertainty() - increase);
+                greenAgent.setUncertainty(greenAgent.getUncertainty() - greenAgent.getUncertainty()/2);
             }
         }
     }
@@ -364,6 +364,10 @@ public class Game {
                 //The agent is "uncertain", so their uncertainty increases
                 else {
                     newUncertainty += mappedPotency;
+                    if (newUncertainty > OPINIONTHRESHOLD) {
+                        curAgent.setVotingOpinion(!curAgent.getVotingOpinion());
+                        curAgent.setUncertainty(-newUncertainty);
+                    }
                 }
             }
             //Agent is on the red team
@@ -371,6 +375,10 @@ public class Game {
                 //The agent is "certain", so their uncertainty increases
                 if (curAgent.getUncertainty() < 0) {
                     newUncertainty += mappedPotency;
+                    if (newUncertainty > OPINIONTHRESHOLD) {
+                        curAgent.setVotingOpinion(!curAgent.getVotingOpinion());
+                        curAgent.setUncertainty(-newUncertainty);
+                    }
                 }
                 //The agent is "uncertain", so their uncertainty decreases
                 else {
@@ -408,6 +416,10 @@ public class Game {
                 //The agent is "certain", so their uncertainty increases and blue loses energy
                 if (curAgent.getUncertainty() < 0) {
                     newUncertainty += mappedPotency;
+                    if (newUncertainty > OPINIONTHRESHOLD) {
+                        curAgent.setVotingOpinion(!curAgent.getVotingOpinion());
+                        curAgent.setUncertainty(-newUncertainty);
+                    }
                 }
                 //The agent is "uncertain", so their uncertainty decreases
                 else {
@@ -423,6 +435,10 @@ public class Game {
                 //The agent is "uncertain", so their uncertainty increases
                 else {
                     newUncertainty += mappedPotency;
+                    if (newUncertainty > OPINIONTHRESHOLD) {
+                        curAgent.setVotingOpinion(!curAgent.getVotingOpinion());
+                        curAgent.setUncertainty(-newUncertainty);
+                    }
                 }
             }
             curAgent.setUncertainty(newUncertainty);
@@ -475,11 +491,10 @@ public class Game {
         if (messagePotency <= 3) {
             //inverse map potency, 1 highest 3 lowest
             messagePotency = 4 - messagePotency;
-            mappedPotency = POTENCYRANGE[0] + ((POTENCYRANGE[1] - POTENCYRANGE[0]) / 2) * (messagePotency - 1); 
-            mappedPotency *= -1;
+            mappedPotency = ((POTENCYRANGE[1] - POTENCYRANGE[0]) / 3) * (messagePotency); 
         } else {
             messagePotency -= 3;
-            mappedPotency = POTENCYRANGE[0] + ((POTENCYRANGE[1] - POTENCYRANGE[0]) / 2) * (messagePotency - 1);
+            mappedPotency = ((POTENCYRANGE[1] - POTENCYRANGE[0]) / 3) * (messagePotency);
         }
         return mappedPotency;
     }
