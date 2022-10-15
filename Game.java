@@ -18,6 +18,9 @@ public class Game {
     private BlueAgent blueAgent;
     private RedAgent redAgent;
 
+    private int previousRedVotingNumber;
+    private int previousBlueVotingNumber;
+
     private final double OPINIONTHRESHOLD = 0.6; //Above this uncertainty inclusively, an agents opinion can change
     private final double FLIPUPPERBOUND = 0.8; //Upperbound of the increase when flipping opinion
     private final double FLIPLOWERBOUND = 0.4; //Lowerbound of the increase when flipping opinion
@@ -178,7 +181,8 @@ public class Game {
      * This executes the green turn, which consists of all green nodes interaction with one another and modifying their opinion and or uncertainty
      */
     public void executeGreenTurn() {
-
+        previousRedVotingNumber = getVotingOpinions()[0];
+        previousBlueVotingNumber = getVotingOpinions()[1];
         //Record all the starting uncertainties of nodes
         double[] curGreenUncertainties = new double[greenAgentCount];
 
@@ -667,8 +671,9 @@ public class Game {
         int[] votingNumbers = getVotingOpinions();
         int redVoting = votingNumbers[0];
         int blueVoting = votingNumbers[1];
+        int gainedRed = votingNumbers[0] - previousRedVotingNumber;
         int redFollowers = (int) (getRedFollowers() / greenAgentCount * 100);
-        String hashBuilder = Integer.toString(redVoting) + Integer.toString(blueVoting) + Integer.toString(redFollowers);
+        String hashBuilder = Integer.toString(gainedRed) + Integer.toString(redVoting) + Integer.toString(blueVoting) + Integer.toString(redFollowers);
         return hashBuilder;
     }
 
@@ -681,8 +686,9 @@ public class Game {
         int[] votingNumbers = getVotingOpinions();
         int redVoting = votingNumbers[0];
         int blueVoting = votingNumbers[1];
+        int gainedBlue = votingNumbers[1] - previousBlueVotingNumber;
         int blueEnergyInt = (int) getBlueEnergyLevel();
-        String hashBuilder = Integer.toString(blueVoting) + Integer.toString(redVoting) + Integer.toString(blueEnergyInt);
+        String hashBuilder = Integer.toString(gainedBlue) + Integer.toString(blueVoting) + Integer.toString(redVoting) + Integer.toString(blueEnergyInt);
         return hashBuilder;
     }
 
