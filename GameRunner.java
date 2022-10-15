@@ -5,7 +5,7 @@ import java.util.Random;
 public class GameRunner {
     private Scanner scanner;
     private Game gameInstance;              // Game
-    private dumbAI redAI;                    // Red AI
+    private RedAI redAI;                    // Red AI
     private BlueAI blueAI;                  // Blue AI
     private boolean playAsRedAI;            // True if Red AI is playing, false otherwise
     private boolean playAsBlueAI;           // True if Blue AI is playing, false otherwise
@@ -46,7 +46,7 @@ public class GameRunner {
     public GameRunner(int greenAgentCount, double probabilityOfConnection, int greyCount, double greyEvilProportion, double[] greenUncertaintyInterval, double greenVotePercent) {
         //There is no error checking because the Game constructor deals with this.
         gameInstance = new Game(greenAgentCount, probabilityOfConnection, greyCount, greyEvilProportion, greenUncertaintyInterval, greenVotePercent);
-        redAI = new dumbAI();    //Creates red AI
+        redAI = new RedAI();    //Creates red AI
         blueAI = new BlueAI();  //Creates blue AI
         scanner = new Scanner(System.in);   //Creates the scanner for user
 
