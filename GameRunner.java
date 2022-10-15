@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class GameRunner {
-    private Scanner scanner = new Scanner(System.in);
+    private Scanner scanner;
     private Game gameInstance;              // Game
     private RedAI redAI;                    // Red AI
     private BlueAI blueAI;                  // Blue AI
@@ -47,7 +47,8 @@ public class GameRunner {
         gameInstance = new Game(greenAgentCount, probabilityOfConnection, greyCount, greyEvilProportion, greenUncertaintyInterval, greenVotePercent);
         redAI = new RedAI();    //Creates red AI
         blueAI = new BlueAI();  //Creates blue AI
-        
+        scanner = new Scanner(System.in);   //Creates the scanner for user
+
         if (displayEndGraphs) {
             //init the arraylist and record the numbers currently voting
             votingForRedList = new ArrayList<>();
