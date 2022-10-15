@@ -577,7 +577,7 @@ public class GameRunner {
         GameRunner curRunner = new GameRunner(40, 0.4, 10, 40.0, uncertaintyInterval, 60.0);
         
         // Silent mode
-        if (args[0].equals("-s")) {
+        if (args.length != 0 &&args[0].equals("-s")) {
             curRunner.setPlayAsAI();
         } 
         // Interactive mode
