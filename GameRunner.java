@@ -174,7 +174,7 @@ public class GameRunner {
             if(!silentFlag) {
                 System.out.println("\nGREEN TEAM");
             }
-            // gameInstance.executeGreenTurn();
+            gameInstance.executeGreenTurn();
 
             if (playAsRedAI) {
                 int[] distribution = gameInstance.getVotingOpinions();
@@ -611,7 +611,7 @@ public class GameRunner {
 
     public static void main(String[] args) {
         double[] uncertaintyInterval = {-1.0, 0.4};
-        GameRunner curRunner = new GameRunner(40, 0.7, 10, 40.0, uncertaintyInterval, 50.0);
+        GameRunner curRunner = new GameRunner(40, 0.4, 10, 40.0, uncertaintyInterval, 60.0);
         
         // Ask user if they want silent
         boolean silentFlag = curRunner.getOption("\nDo you wish to enable the silent flag?\nWhen this is true, nothing will be printed to terminal.\nWhen it is false, statistics will be printed to the terminal after each turn.\nPlease type in y for yes or n for no.");
