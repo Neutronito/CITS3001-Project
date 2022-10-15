@@ -428,13 +428,15 @@ public class Game {
     /**
      * Executes the blue turn option 2 to let a grey agent into the green network.
      */
-    public int executeBlueTurn2() {
+    public int executeBlueTurn2(boolean silentFlag) {
         Random indexGenerator = new Random();
         int greyAgentIndex = indexGenerator.nextInt(greyAgentCount);
         GreyAgent greyAgent = greyAgentsList[greyAgentIndex];
         int messagePotency = greyAgent.chooseMessage();
-        System.out.printf("Grey Agent %d chosen is from %s team.\n", greyAgentIndex, greyAgent.getBlueTeamStatus() ? "blue" : "red");
-        System.out.printf("Grey Agent chose Potency %d.\n", messagePotency);
+        if(!silentFlag) {
+            System.out.printf("Grey Agent %d chosen is from %s team.\n", greyAgentIndex, greyAgent.getBlueTeamStatus() ? "blue" : "red");
+            System.out.printf("Grey Agent chose Potency %d.\n", messagePotency);
+        }
         //Grey Agent is on the blue team
         if (greyAgent.getBlueTeamStatus()) {
             executeBlueTurn1(messagePotency, true);

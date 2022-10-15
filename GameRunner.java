@@ -26,6 +26,7 @@ public class GameRunner {
     private boolean displayGreenGraph;
     private boolean displayEndGraphs;
     private boolean displayNetwork;
+    private boolean silentFlag;
 
     private ArrayList<Integer> votingForRedList;
     private ArrayList<Integer> votingForBlueList;
@@ -100,6 +101,13 @@ public class GameRunner {
     }
 
     /**
+     * Initialise silent flag.
+     */
+    public void setSilent(boolean sFlag) {
+        silentFlag = sFlag;
+    }
+
+    /**
      * Initialises whether the Red or Blue agent is played by a user or AI.
      * @param agent Red or Blue agent
      */
@@ -137,8 +145,10 @@ public class GameRunner {
      */
     public int playGame() {
         int numIterations = 0;
-        gameInstance.printGreenAgents();
-        gameInstance.printGreenStatistics();
+        if(!silentFlag) {
+            gameInstance.printGreenAgents();
+            gameInstance.printGreenStatistics();
+        } 
 
         if (displayNetwork) {
             displayNetworks();
@@ -161,7 +171,9 @@ public class GameRunner {
             int bluePotency = playBluePotency(blueOption);
             
             //Execute the green turn
-            System.out.println("\nGREEN TEAM");
+            if(!silentFlag) {
+                System.out.println("\nGREEN TEAM");
+            }
             gameInstance.executeGreenTurn();
 
             if (playAsRedAI) {
@@ -185,10 +197,12 @@ public class GameRunner {
             }
             
             //Print the metrics now
-            gameInstance.printGreenAgents();
-            gameInstance.printGreenStatistics();
-            gameInstance.printBlueEnergyLevel();
-            gameInstance.printRedFollowerCount();
+            if (!silentFlag) {
+                gameInstance.printGreenAgents();
+                gameInstance.printGreenStatistics();
+                gameInstance.printBlueEnergyLevel();
+                gameInstance.printRedFollowerCount();
+            }
 
             //Ask the user if they wish to see the graph
             if (displayGreenGraph) {
@@ -219,6 +233,14 @@ public class GameRunner {
                 triggerGameEnd = (numIterations == maxIterations);
             }
         }
+
+        if(silentFlag) {
+            System.out.println();
+            gameInstance.printGreenStatistics();
+            gameInstance.printBlueEnergyLevel();
+            gameInstance.printRedFollowerCount();
+        }
+
         if (gameInstance.triggerGameEnd()) {
             System.out.println("Game is Over : Blue energy depleted.");
         } 
@@ -258,7 +280,10 @@ public class GameRunner {
      */
     public int playRedTurn() {
         int redPotency;
-        System.out.println("\nRED AGENT'S TURN");
+
+        if(!silentFlag) {
+            System.out.println("\nRED AGENT'S TURN");
+        }
 
         //If red AI is playing
         if (playAsRedAI) {
@@ -269,7 +294,10 @@ public class GameRunner {
         else {
             redPotency = getMessagePotency("red");
         }
-        System.out.printf("Red Agent chose Potency %d.\n", redPotency);
+
+        if(!silentFlag) {
+            System.out.printf("Red Agent chose Potency %d.\n", redPotency);
+        }
         gameInstance.executeRedTurn(redPotency, false);
 
         return redPotency;
@@ -281,7 +309,10 @@ public class GameRunner {
      */
     public int playBlueTurn() {
         int blueOption;
-        System.out.println("\nBLUE AGENT'S TURN");
+
+        if(!silentFlag) {
+            System.out.println("\nBLUE AGENT'S TURN");
+        }
 
         //If blue AI is playing
         if (playAsBlueAI) {
@@ -307,17 +338,23 @@ public class GameRunner {
             if (playAsBlueAI) {
                 String mapHash = gameInstance.blueHashBoardState();
                 bluePotency = blueAI.chooseMessagePotency(mapHash);
-                System.out.printf("Blue AI chose Option %d and Potency %d.\n", blueOption, bluePotency);
+                if(!silentFlag) {
+                    System.out.printf("Blue AI chose Option %d and Potency %d.\n", blueOption, bluePotency);
+                }
             } else {
                 bluePotency = getMessagePotency("blue");
-                System.out.printf("Blue Agent chose Option %d and Potency %d.\n", blueOption, bluePotency);
+                if(!silentFlag) {
+                    System.out.printf("Blue Agent chose Option %d and Potency %d.\n", blueOption, bluePotency);
+                }
             }
             gameInstance.executeBlueTurn1(bluePotency, false);
         } 
         //If option 2 is chosen - let grey agent into green network.
         else if (blueOption == 2) {
-            System.out.printf("Blue Agent chose Option %d.\n", blueOption);
-            bluePotency = gameInstance.executeBlueTurn2();
+            if(!silentFlag) {
+                System.out.printf("Blue Agent chose Option %d.\n", blueOption);
+            }
+            bluePotency = gameInstance.executeBlueTurn2(silentFlag);
         } else {
             throw new IllegalArgumentException("Error, the blue option must be either 1 or 2.");
         }
@@ -576,24 +613,21 @@ public class GameRunner {
         double[] uncertaintyInterval = {-1.0, 0.4};
         GameRunner curRunner = new GameRunner(40, 0.4, 10, 40.0, uncertaintyInterval, 60.0);
         
-        // Silent mode
-        if (args[0].equals("-s")) {
-            curRunner.setPlayAsAI();
-        } 
-        // Interactive mode
-        else {
-            // Ask user for visualisation options
-            boolean displayGreenGraph = curRunner.getOption("\nDo you wish to see the green network graph for each round?\nPlease type in y for yes or n for no.");
-            boolean displayEndGraphs = curRunner.getOption("\nDo you wish to see the graph of voting opinions and average uncertainty over time at the end of the game?\nPlease type in y for yes or n for no.");
-            boolean displayNetwork = curRunner.getOption("\nDo you wish to see the network graphs for green and grey agents?\nPlease type in y for yes or n for no.");
-            curRunner. setDisplays(displayGreenGraph, displayEndGraphs, displayNetwork);
-            
-            // Ask user if red agent is played by user or AI
-            curRunner.playAsUser("red");
-            // Ask user if blue agent is played by user or AI
-            curRunner.playAsUser("blue");
-        }
-       
+        // Ask user if they want silent
+        boolean silentFlag = curRunner.getOption("\nDo you wish to enable the silent flag?\nWhen this is true, nothing will be printed to terminal.\nWhen it is false, statistics will be printed to the terminal after each turn.\nPlease type in y for yes or n for no.");
+        curRunner.setSilent(silentFlag);
+
+        // Ask user for visualisation options
+        boolean displayGreenGraph = curRunner.getOption("\nDo you wish to see the green network graph for each round?\nPlease type in y for yes or n for no.");
+        boolean displayEndGraphs = curRunner.getOption("\nDo you wish to see the graph of voting opinions and average uncertainty over time at the end of the game?\nPlease type in y for yes or n for no.");
+        boolean displayNetwork = curRunner.getOption("\nDo you wish to see the network graphs for green and grey agents?\nPlease type in y for yes or n for no.");
+        curRunner.setDisplays(displayGreenGraph, displayEndGraphs, displayNetwork);
+        
+        // Ask user if red agent is played by user or AI
+        curRunner.playAsUser("red");
+        // Ask user if blue agent is played by user or AI
+        curRunner.playAsUser("blue");
+
         curRunner.playGame();
     }
 }
