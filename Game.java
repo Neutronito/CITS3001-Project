@@ -360,10 +360,17 @@ public class Game {
                 //The agent is "certain", so their uncertainty decreases
                 if (curAgent.getUncertainty() < 0) {
                     newUncertainty -= mappedPotency;
+                    curAgent.setUncertainty(newUncertainty);
                 }
                 //The agent is "uncertain", so their uncertainty increases
                 else {
                     newUncertainty += mappedPotency;
+                    if (newUncertainty > OPINIONTHRESHOLD) {
+                        curAgent.setVotingOpinion(!curAgent.getVotingOpinion());
+                        curAgent.setUncertainty(-newUncertainty);
+                    } else {
+                        curAgent.setUncertainty(newUncertainty);
+                    }
                 }
             }
             //Agent is on the red team
@@ -371,13 +378,20 @@ public class Game {
                 //The agent is "certain", so their uncertainty increases
                 if (curAgent.getUncertainty() < 0) {
                     newUncertainty += mappedPotency;
+                    if (newUncertainty > OPINIONTHRESHOLD) {
+                        curAgent.setVotingOpinion(!curAgent.getVotingOpinion());
+                        curAgent.setUncertainty(-newUncertainty);
+                    } else {
+                        curAgent.setUncertainty(newUncertainty);
+                    }
                 }
                 //The agent is "uncertain", so their uncertainty decreases
                 else {
                     newUncertainty -= mappedPotency;
+                    curAgent.setUncertainty(newUncertainty);
                 }
             }
-            curAgent.setUncertainty(newUncertainty);
+            
         }
     }
 
@@ -408,10 +422,17 @@ public class Game {
                 //The agent is "certain", so their uncertainty increases and blue loses energy
                 if (curAgent.getUncertainty() < 0) {
                     newUncertainty += mappedPotency;
+                    if (newUncertainty > OPINIONTHRESHOLD) {
+                        curAgent.setVotingOpinion(!curAgent.getVotingOpinion());
+                        curAgent.setUncertainty(-newUncertainty);
+                    } else {
+                        curAgent.setUncertainty(newUncertainty);
+                    }
                 }
                 //The agent is "uncertain", so their uncertainty decreases
                 else {
                     newUncertainty -= mappedPotency;
+                    curAgent.setUncertainty(newUncertainty);
                 }
             }
             //Agent is on the red team
@@ -419,13 +440,20 @@ public class Game {
                 //The agent is "certain", so their uncertainty decreases and blue loses energy
                 if (curAgent.getUncertainty() < 0) {
                     newUncertainty -= mappedPotency;
+                    curAgent.setUncertainty(newUncertainty);
                 }
                 //The agent is "uncertain", so their uncertainty increases
                 else {
                     newUncertainty += mappedPotency;
+                    if (newUncertainty > OPINIONTHRESHOLD) {
+                        curAgent.setVotingOpinion(!curAgent.getVotingOpinion());
+                        curAgent.setUncertainty(-newUncertainty);
+                    } else {
+                        curAgent.setUncertainty(newUncertainty);
+                    }
                 }
             }
-            curAgent.setUncertainty(newUncertainty);
+            
         }
     }
 
