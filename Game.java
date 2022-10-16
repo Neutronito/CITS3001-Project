@@ -20,6 +20,7 @@ public class Game {
 
     private int previousRedVotingNumber;
     private int previousBlueVotingNumber;
+    private int confidence;
 
     private final double OPINIONTHRESHOLD = 0.6; //Above this uncertainty inclusively, an agents opinion can change
     private final double FLIPUPPERBOUND = 0.8; //Upperbound of the increase when flipping opinion
@@ -30,11 +31,12 @@ public class Game {
     private final double CHANGEPOSITIVETHRESHOLD = 0.05; //Threshold if uncerainty increases
     private final double CHANGENEGATIVETHRESHOLD  = 0.15; //Threshold if uncertainty decreases
 
-    private final double PULLUPSCALEFACTOR = 1.2; //This is a factor multiplied to the increase value (of the weaker node) when two nodes agree
+    private final double PULLDOWNSCALEFACTOR = 0.9; //This is a factor multiplied to the decrease uncertainty 
+    private final double PULLUPSCALEFACTOR = 1.1; //This is a factor multiplied to the increase uncertainty
     
     private final double[] POTENCYRANGE = {0.1, 0.4}; //This is the potency effect range of the map from the red and blue message potency
 
-    private final double ENERGYSCALEFACTOR = 1.5; //This is a factor mutliplied to calculate the amount of energy loss for blue agent
+    private final double ENERGYSCALEFACTOR = 1.3; //This is a factor mutliplied to calculate the amount of energy loss for blue agent
     private final double FOLLOWERSCALEFACTOR = 0.025; //This is a factor mutliplied to calculate the amount of follower loss for red agent
 
     /**
@@ -175,6 +177,9 @@ public class Game {
 
         //Create the red agent
         redAgent = new RedAgent(greenAgentCount);
+
+        //Initialise green confidence
+        confidence = 15;
     }
 
     /**
@@ -210,48 +215,59 @@ public class Game {
 
                 double firstOutput = firstUncertainty;
                 double secondOutput = secondUncertainty;
+                double difference = (2 - firstUncertainty) - (2 - secondUncertainty);
 
                 //They have different opinion
                 if (firstOpinion != secondOpinion) {
-                    
-                    //This is for first agent
-                    double error = (firstUncertainty + 1) - (secondUncertainty + 1);
-                  
-                    if (error >= 0) {
-                        firstOutput = (1 - firstUncertainty) * (error / 2) + firstUncertainty;
-                    } else {
-                        error *= -1;
-                        firstOutput = (1 - firstUncertainty) * (error / 2) / 100 + firstUncertainty;
+                    if (difference > 0) { //First agent is more certain 
+                        if (secondUncertainty > 0) {    //Second uncertainty decreases
+                            secondOutput *= (PULLDOWNSCALEFACTOR+0.05);
+                        } else {
+                            secondOutput *= (PULLUPSCALEFACTOR-0.05);
+                        }
+                        if (firstUncertainty > 0) {     //First uncertainty increases
+                            firstOutput *= (PULLUPSCALEFACTOR+0.05);
+                        } else {
+                            firstOutput *= (PULLDOWNSCALEFACTOR-0.05);
+                        }
+                    } else { //Second agent is more certain 
+                        if (firstUncertainty > 0) {     //First uncertainty decreases
+                            firstOutput *= (PULLDOWNSCALEFACTOR+0.05);
+                        } else {
+                            firstOutput *= (PULLUPSCALEFACTOR-0.05);
+                        }
+                        if (secondUncertainty > 0) {     //Second uncertainty increases
+                            secondOutput *= (PULLUPSCALEFACTOR+0.05);
+                        } else {
+                            secondOutput *= (PULLDOWNSCALEFACTOR-0.05);
+                        }
                     }
-
-                    //This is for the second agent
-                    error = (secondUncertainty + 1) - (firstUncertainty + 1);
-                  
-                    if (error >= 0) {
-                        secondOutput = (1 - secondUncertainty) * (error / 2) + secondUncertainty;
-                    } else {
-                        error *= -1;
-                        secondOutput = (1 - secondUncertainty) * (error / 2) / 100 + secondUncertainty;
-                    }
-
                 } 
                 
                 //They have the same opinion.
                 else {
-
-                    //Effectively, the more certain agent will pull up the least certain agent
-                    double error = (firstUncertainty + 1) - (secondUncertainty + 1);
-
-                    //Second agent is more certain 
-                    if (error > 0) {
-                        firstOutput = (1 - firstUncertainty) * (error / 2) + firstUncertainty;
-                        firstOutput *= PULLUPSCALEFACTOR;
+                    if (difference > 0) { //First agent is more certain 
+                        if (secondUncertainty > 0) {    //Second uncertainty decreases
+                            secondOutput *= PULLDOWNSCALEFACTOR;
+                        } else {
+                            secondOutput *= PULLUPSCALEFACTOR;
+                        }
                     }
-                    //First agent is more certain
-                    else {
-                        error *= -1;
-                        secondOutput = (1 - secondUncertainty) * (error / 2) + secondUncertainty;
-                        secondOutput *= PULLUPSCALEFACTOR;
+                    else if (difference == 0) { //Same certainty
+                        if (firstUncertainty > 0) {     //Both uncertainty decreases
+                            firstOutput *= PULLDOWNSCALEFACTOR;
+                            secondOutput *= PULLDOWNSCALEFACTOR;
+                        } else {
+                            firstOutput *= PULLUPSCALEFACTOR;
+                            secondOutput *= PULLUPSCALEFACTOR;
+                        }
+                    }
+                    else { //Second agent is more certain 
+                        if (firstUncertainty > 0) {     //First uncertainty decreases
+                            firstOutput *= PULLDOWNSCALEFACTOR;
+                        } else {
+                            firstOutput *= PULLUPSCALEFACTOR;
+                        }
                     }
                 }
                 
@@ -259,20 +275,14 @@ public class Game {
                 //However, we can liken this to the agents going home and thinking about the conversation, and then changing their mindset so it is realistic.
                 firstAgent.setUncertainty(firstOutput);
                 secondAgent.setUncertainty(secondOutput);
-
-                //Change opinion if green agent uncertainty is above the threshold
-                changeGreenOpinion(firstAgent);
-                changeGreenOpinion(secondAgent);
             }
         }
 
         //Now consider the change of each agents uncertainty
         //If an agents uncertainty didnt change much, they passively become slightly more certain
         for (int i = 0; i < greenAgentCount; i++) {
-            double change = greenAgentsList[i].getUncertainty() - curGreenUncertainties[i];
-
-            //Uncertainty decreased
-            if (change < 0) {
+            double change = (2-greenAgentsList[i].getUncertainty()) - (2-curGreenUncertainties[i]);
+            if (change < 0) { //Uncertainty decreased
                 change *= -1;
                 //Check if its below the threshold
                 if (change < CHANGENEGATIVETHRESHOLD) {
@@ -280,8 +290,7 @@ public class Game {
                     greenAgentsList[i].setUncertainty(greenAgentsList[i].getUncertainty() - increase);
                 }
             }
-            //Uncertainty increased
-            else {
+            else { //Uncertainty increased
                 //Check if its below the threshold
                 if (change < CHANGEPOSITIVETHRESHOLD) {
                     double increase = CHANGENEGATIVETHRESHOLD - change;
@@ -289,6 +298,13 @@ public class Game {
                 }
             }
         }
+
+        // Now change uncertainties
+        for (GreenAgent cur : greenAgentsList) {
+            changeGreenOpinion(cur);
+        }
+
+        confidence += 5;
     }
 
     /**
@@ -297,28 +313,58 @@ public class Game {
      * @param greenAgent The green agent to be considered.
      */
     public void changeGreenOpinion(GreenAgent greenAgent) {
-        Random opinionGenerator = new Random();
-        //Check if green agent uncertainty is above the threshold
-        if (greenAgent.getUncertainty() > OPINIONTHRESHOLD) {
-            //Note, we assume the threshold is always positive
-            int thresholdRange = (int)((1 - OPINIONTHRESHOLD) * OPINIONSCALEFACTOR);
-            int randomNumber = opinionGenerator.nextInt(thresholdRange);
-            int greenAgentMapped = (int)((greenAgent.getUncertainty() - OPINIONTHRESHOLD) * OPINIONSCALEFACTOR);
-            
-            //This means their opinion changes
-            if (randomNumber <= greenAgentMapped) {
-                greenAgent.setVotingOpinion(!greenAgent.getVotingOpinion());
-                
-                //Pick a random value to increase by based on the given range.
-                int range = (int)((FLIPUPPERBOUND - FLIPLOWERBOUND) * OPINIONSCALEFACTOR);
-                double increase = opinionGenerator.nextInt(range);
-                increase /= OPINIONSCALEFACTOR;
-
-                greenAgent.setUncertainty(greenAgent.getUncertainty() - increase);
+        Random rand = new Random();
+        int probabilityOfChanging = rand.nextInt(100) + 1;
+        int totalRed = getVotingOpinions()[0];
+        int totalBlue = getVotingOpinions()[1];
+        double blueAvg = getAverageUncertainty(true);
+        double redAvg = getAverageUncertainty(false);
+        // System.out.println(probabilityOfChanging + " < " + confidence);
+        if (probabilityOfChanging < confidence) {
+            // System.out.println("changes");
+            // If population is has more towards red, opinions should skew towards red
+            if (totalRed > totalBlue && redAvg < blueAvg) {
+                int chance = rand.nextInt(100) + 1;
+                if (greenAgent.getVotingOpinion() && greenAgent.getUncertainty() > -0.3 && chance < confidence) {
+                    greenAgent.setVotingOpinion(!greenAgent.getVotingOpinion());
+                    greenAgent.setUncertainty(greenAgent.getUncertainty() + 0.5);
+                }
+                chance = rand.nextInt(100) + 1;
+                if (!greenAgent.getVotingOpinion() && greenAgent.getUncertainty() > 0 && chance < confidence) {
+                    greenAgent.setVotingOpinion(!greenAgent.getVotingOpinion());
+                    greenAgent.setUncertainty(greenAgent.getUncertainty() + 0.3);
+                }
+            } 
+            else if (totalBlue == totalRed) { // Skew towards the side with lower average uncertainty
+                int chance = rand.nextInt(100) + 1;
+                if (redAvg < blueAvg) {
+                    if (greenAgent.getVotingOpinion() && greenAgent.getUncertainty() > -0.3 && chance < confidence) {
+                        greenAgent.setVotingOpinion(!greenAgent.getVotingOpinion());
+                        greenAgent.setUncertainty(greenAgent.getUncertainty() + 0.5);
+                    }
+                } else if (blueAvg < redAvg) {
+                    if (!greenAgent.getVotingOpinion() && greenAgent.getUncertainty() > -0.1 && chance < confidence) {
+                        greenAgent.setVotingOpinion(!greenAgent.getVotingOpinion());
+                        greenAgent.setUncertainty(greenAgent.getUncertainty() + 0.5);
+                    }
+                }
+            }
+            // If population is has more towards blue, opinions should skew towards blue
+            if (totalBlue > totalRed && redAvg > blueAvg) {
+                int chance = rand.nextInt(100) + 1;
+                if (!greenAgent.getVotingOpinion() && greenAgent.getUncertainty() > -0.3 && chance < confidence) {
+                    greenAgent.setVotingOpinion(!greenAgent.getVotingOpinion());
+                    greenAgent.setUncertainty(greenAgent.getUncertainty() + 0.5);
+                }
+                chance = rand.nextInt(100) + 1;
+                if (greenAgent.getVotingOpinion() && greenAgent.getUncertainty() > 0 && chance < confidence) {
+                    greenAgent.setVotingOpinion(!greenAgent.getVotingOpinion());
+                    greenAgent.setUncertainty(greenAgent.getUncertainty() + 0.3);
+                }
             }
         }
     }
-
+    
     /**
      * Executes the red turn, based on the given message potency.
      * @param messagePotency The message potency from 1 to 6 inclusive, the higher the number the more potent.
@@ -327,7 +373,7 @@ public class Game {
     public void executeRedTurn(int messagePotency, boolean byGreySpy) {
         //Get mapped potency
         double mappedPotency = handleMessagePotency(messagePotency);
-
+        
         //If red turn is not executed by grey spy, decrease follower count
         if (!byGreySpy) {
             if (messagePotency >= 3) {
@@ -503,11 +549,10 @@ public class Game {
         if (messagePotency <= 3) {
             //inverse map potency, 1 highest 3 lowest
             messagePotency = 4 - messagePotency;
-            mappedPotency = POTENCYRANGE[0] + ((POTENCYRANGE[1] - POTENCYRANGE[0]) / 2) * (messagePotency - 1); 
-            mappedPotency *= -1;
+            mappedPotency = (messagePotency * 0.15); 
         } else {
             messagePotency -= 3;
-            mappedPotency = POTENCYRANGE[0] + ((POTENCYRANGE[1] - POTENCYRANGE[0]) / 2) * (messagePotency - 1);
+            mappedPotency = (messagePotency * 0.15); 
         }
         return mappedPotency;
     }

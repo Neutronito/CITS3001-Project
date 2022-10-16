@@ -5,7 +5,7 @@ import java.util.Random;
 public class GameRunner {
     private Scanner scanner;
     private Game gameInstance;              // Game
-    private RedAI redAI;                    // Red AI
+    private dumbAI redAI;                    // Red AI
     private BlueAI blueAI;                  // Blue AI
     private boolean playAsRedAI;            // True if Red AI is playing, false otherwise
     private boolean playAsBlueAI;           // True if Blue AI is playing, false otherwise
@@ -46,7 +46,7 @@ public class GameRunner {
     public GameRunner(int greenAgentCount, double probabilityOfConnection, int greyCount, double greyEvilProportion, double[] greenUncertaintyInterval, double greenVotePercent) {
         //There is no error checking because the Game constructor deals with this.
         gameInstance = new Game(greenAgentCount, probabilityOfConnection, greyCount, greyEvilProportion, greenUncertaintyInterval, greenVotePercent);
-        redAI = new RedAI();    //Creates red AI
+        redAI = new dumbAI();    //Creates red AI
         blueAI = new BlueAI();  //Creates blue AI
         scanner = new Scanner(System.in);   //Creates the scanner for user
 
@@ -137,6 +137,60 @@ public class GameRunner {
         }
     }
 
+    public void playGreenTest() {
+        gameInstance.printGreenStatistics();
+        gameInstance.executeGreenTurn();
+        // gameInstance.printGreenAgents();
+        gameInstance.printGreenStatistics();
+        for (int i = 0; i < 10; i++) {
+            gameInstance.executeGreenTurn();
+            gameInstance.printGreenStatistics();
+        }
+        // gameInstance.printGreenAgents();
+    }
+
+    public void playRedTest() {
+        int[] beforeTurnDistribution = gameInstance.getVotingOpinions();
+        String mapHash = gameInstance.redHashBoardState();
+        gameInstance.printGreenStatistics();
+        int redMove = playRedTurn();
+        gameInstance.executeGreenTurn();
+        // gameInstance.printGreenAgents();
+        gameInstance.printGreenStatistics();
+        int[] distribution = gameInstance.getVotingOpinions();
+        //Execute the red rewards
+        int redGain = distribution[0] - beforeTurnDistribution[0];
+        int reward = (int)((double)(redGain) / (double)(distribution[0] + distribution[1]) * 100.0);
+        if (redGain < 0) {
+            reward = redGain*10;
+        }
+        
+        redAI.updateRewards(reward, mapHash, redMove);
+        // gameInstance.printGreenAgents();
+        redAI.endGame();
+    }
+
+    public void playBlueTest() {
+        int[] beforeTurnDistribution = gameInstance.getVotingOpinions();
+        String mapHash = gameInstance.blueHashBoardState();
+        gameInstance.printGreenStatistics();
+        int move = playBluePotency(1);
+        gameInstance.executeGreenTurn();
+        // gameInstance.printGreenAgents();
+        gameInstance.printGreenStatistics();
+        int[] distribution = gameInstance.getVotingOpinions();
+        //Execute the red rewards
+        int blueGain = distribution[1] - beforeTurnDistribution[1];
+        int reward = (int)((double)(blueGain) / (double)(distribution[0] + distribution[1]) * 100.0);
+        if (blueGain < 0) {
+            reward = blueGain*10;
+        }
+        
+        blueAI.updateRewards(reward, mapHash, move, 1);
+        // gameInstance.printGreenAgents();
+        blueAI.endGame();
+    }
+
     /**
      * A blocking function that executes the game, waiting for human inputs for the red turn. The red turn is executed before the green turn
      * Prints the game statistics after each turn.
@@ -159,9 +213,19 @@ public class GameRunner {
         boolean triggerGameEnd = false;         
 
         while (!triggerGameEnd) {
+            // long startTime = System.currentTimeMillis();
             numIterations++;
+            String mapHashR = gameInstance.redHashBoardState();
+            String mapHashB = gameInstance.blueHashBoardState();
+
             //store the voting distribution
             int[] beforeTurnDistribution = gameInstance.getVotingOpinions();
+
+            //Execute the green turn
+            if(!silentFlag) {
+                System.out.println("\nGREEN TEAM");
+            }
+            gameInstance.executeGreenTurn();
 
             //Execute the red turn
             int redMove = playRedTurn();
@@ -169,12 +233,6 @@ public class GameRunner {
             //Execute the blue turn
             int blueOption = playBlueTurn();
             int bluePotency = playBluePotency(blueOption);
-            
-            //Execute the green turn
-            if(!silentFlag) {
-                System.out.println("\nGREEN TEAM");
-            }
-            gameInstance.executeGreenTurn();
 
             if (playAsRedAI) {
                 int[] distribution = gameInstance.getVotingOpinions();
@@ -182,8 +240,11 @@ public class GameRunner {
                 //Execute the red rewards
                 int redGain = distribution[0] - beforeTurnDistribution[0];
                 int reward = (int)((double)(redGain) / (double)(distribution[0] + distribution[1]) * 100.0);
-                String mapHash = gameInstance.redHashBoardState();
-                redAI.updateRewards(reward, mapHash, redMove);
+                if (redGain < 0) {
+                    reward = redGain*10;
+                }
+                
+                redAI.updateRewards(reward, mapHashR, redMove);
             }
 
             if (playAsBlueAI) {
@@ -192,8 +253,10 @@ public class GameRunner {
                 //Execute the red rewards
                 int blueGain = distribution[1] - beforeTurnDistribution[1];
                 int reward = (int)((double)(blueGain) / (double)(distribution[0] + distribution[1]) * 100.0);
-                String mapHash = gameInstance.blueHashBoardState();
-                blueAI.updateRewards(reward, mapHash, bluePotency, blueOption);
+                if (blueGain < 0) {
+                    reward = blueGain*10;
+                }
+                blueAI.updateRewards(reward, mapHashB, bluePotency, blueOption);
             }
             
             //Print the metrics now
@@ -232,6 +295,8 @@ public class GameRunner {
             if (!triggerGameEnd) {
                 triggerGameEnd = (numIterations == maxIterations);
             }
+            // long endTime = System.currentTimeMillis();
+            // System.out.println("That took " + (endTime - startTime) + " milliseconds");
         }
 
         if(silentFlag) {
@@ -271,7 +336,13 @@ public class GameRunner {
         blueAI.endGame();
 
         scanner.close();
-        return 0;
+        if (blueTotal > redTotal) {
+            return 1;
+        } else if (blueTotal == redTotal) {
+            return 0;
+        } else {
+            return -1;
+        }    
     }
 
     /**
@@ -610,24 +681,43 @@ public class GameRunner {
     }
 
     public static void main(String[] args) {
-        double[] uncertaintyInterval = {-1.0, 0.4};
-        GameRunner curRunner = new GameRunner(40, 0.4, 10, 40.0, uncertaintyInterval, 60.0);
         
-        // Ask user if they want silent
-        boolean silentFlag = curRunner.getOption("\nDo you wish to enable the silent flag?\nWhen this is true, nothing will be printed to terminal.\nWhen it is false, statistics will be printed to the terminal after each turn.\nPlease type in y for yes or n for no.");
-        curRunner.setSilent(silentFlag);
+        double[] uncertaintyInterval = {-1.0, 1.0};
+        GameRunner curRunner = new GameRunner(50, 0.5, 10, 40.0, uncertaintyInterval,10.0);
+        if (args[0].equals("-s")) {
+            curRunner.setPlayAsAI();
+            curRunner.setSilent(true);
+        } else {
+            // Ask user if they want silent
+            boolean silentFlag = curRunner.getOption("\nDo you wish to enable the silent flag?\nWhen this is true, nothing will be printed to terminal.\nWhen it is false, statistics will be printed to the terminal after each turn.\nPlease type in y for yes or n for no.");
+            curRunner.setSilent(silentFlag);
 
-        // Ask user for visualisation options
-        boolean displayGreenGraph = curRunner.getOption("\nDo you wish to see the green network graph for each round?\nPlease type in y for yes or n for no.");
-        boolean displayEndGraphs = curRunner.getOption("\nDo you wish to see the graph of voting opinions and average uncertainty over time at the end of the game?\nPlease type in y for yes or n for no.");
-        boolean displayNetwork = curRunner.getOption("\nDo you wish to see the network graphs for green and grey agents?\nPlease type in y for yes or n for no.");
-        curRunner.setDisplays(displayGreenGraph, displayEndGraphs, displayNetwork);
-        
-        // Ask user if red agent is played by user or AI
-        curRunner.playAsUser("red");
-        // Ask user if blue agent is played by user or AI
-        curRunner.playAsUser("blue");
-
-        curRunner.playGame();
+            // Ask user for visualisation options
+            boolean displayGreenGraph = curRunner.getOption("\nDo you wish to see the green network graph for each round?\nPlease type in y for yes or n for no.");
+            boolean displayEndGraphs = curRunner.getOption("\nDo you wish to see the graph of voting opinions and average uncertainty over time at the end of the game?\nPlease type in y for yes or n for no.");
+            boolean displayNetwork = curRunner.getOption("\nDo you wish to see the network graphs for green and grey agents?\nPlease type in y for yes or n for no.");
+            curRunner.setDisplays(displayGreenGraph, displayEndGraphs, displayNetwork);
+            
+            // Ask user if red agent is played by user or AI
+            curRunner.playAsUser("red");
+            // Ask user if blue agent is played by user or AI
+            curRunner.playAsUser("blue");
+        }
+        // curRunner.playBlueTest();
+        // curRunner.playRedTest();
+        // curRunner.playGreenTest();
+        // curRunner.playGame();
+        int redWins = 0;
+        int blueWins = 0;
+        for (int i = 1; i < 51; i++) {
+            int winner = curRunner.playGame();
+            if (winner == -1) {
+                redWins++;
+            } else if (winner == 1) {
+                blueWins++;
+            }
+        }
+        System.out.printf("Blue won %d out of 50 times.\n", blueWins);
+        System.out.printf("Red won %d out of 50 times.", redWins);
     }
 }

@@ -324,7 +324,7 @@ public class BlueAI {
             Integer[] hashValue = {hashPotency, hashOption};
             allMoves.put(mapHash, hashValue);
         } else {
-            if (reward < hashReward[0]) {
+            if (reward > hashReward[0]) {
                 if (reward < 0) {
                     hashPotency *= -1;
                 }
@@ -332,7 +332,7 @@ public class BlueAI {
                 allMoves.put(mapHash, hashValue);
             } 
 
-            if (reward < hashReward[1]) {
+            if (reward > hashReward[1]) {
                 if (reward < 0) {
                     hashOption *= -1;
                 }

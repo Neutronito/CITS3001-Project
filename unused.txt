@@ -68,3 +68,69 @@ Unused Functions in Game.java
         double[] output = {proportionCertainGreens, proportionCertainBlues, proportionCertainReds};
         return output;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //Agent is on the blue team
+            if (curAgent.getVotingOpinion()) {
+                if (messagePotency >= 4) {  // Increase uncertainty
+                    if (curAgent.getUncertainty() > 0) {
+                        newUncertainty += mappedPotency;
+                        if (newUncertainty > OPINIONTHRESHOLD) {
+                            curAgent.setVotingOpinion(!curAgent.getVotingOpinion());
+                            curAgent.setUncertainty(-newUncertainty);
+                        }
+                    } else {
+                        newUncertainty -= mappedPotency;
+                    }
+                    curAgent.setUncertainty(newUncertainty);
+                } else if (messagePotency <= 3) {   // Decrease uncertainty
+                    if (curAgent.getUncertainty() > 0) {
+                        newUncertainty -= mappedPotency;
+                    } else {
+                        newUncertainty += mappedPotency;
+                        if (newUncertainty > OPINIONTHRESHOLD) {
+                            curAgent.setVotingOpinion(!curAgent.getVotingOpinion());
+                            curAgent.setUncertainty(-newUncertainty);
+                        }
+                    }
+                    curAgent.setUncertainty(newUncertainty);
+                }
+            }
+            //Agent is on the red team
+            else {
+                if (messagePotency >= 4) {  // Decrease uncertainty
+                    if (curAgent.getUncertainty() > 0) {
+                        newUncertainty -= mappedPotency;
+                    } else {
+                        newUncertainty += mappedPotency;
+                        if (newUncertainty > OPINIONTHRESHOLD) {
+                            curAgent.setVotingOpinion(!curAgent.getVotingOpinion());
+                            curAgent.setUncertainty(-newUncertainty);
+                        }
+                    }
+                    curAgent.setUncertainty(newUncertainty);
+                } else if (messagePotency <= 3) {   // Increase uncertainty
+                    if (curAgent.getUncertainty() > 0) {
+                        newUncertainty += mappedPotency;
+                        if (newUncertainty > OPINIONTHRESHOLD) {
+                            curAgent.setVotingOpinion(!curAgent.getVotingOpinion());
+                            curAgent.setUncertainty(-newUncertainty);
+                        }
+                    } else {
+                        newUncertainty -= mappedPotency;
+                    }
+                    curAgent.setUncertainty(newUncertainty);
+                }
+            }
