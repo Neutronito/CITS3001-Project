@@ -2,3 +2,4 @@
 *.class
 /venv
 /__pycache__
+/Submission
