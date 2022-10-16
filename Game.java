@@ -34,7 +34,7 @@ public class Game {
     
     private final double[] POTENCYRANGE = {0.1, 0.4}; //This is the potency effect range of the map from the red and blue message potency
 
-    private final double ENERGYSCALEFACTOR = 1.5; //This is a factor mutliplied to calculate the amount of energy loss for blue agent
+    private final double ENERGYSCALEFACTOR = 25; //This is a factor mutliplied to calculate the amount of energy loss for blue agent
     private final double FOLLOWERSCALEFACTOR = 0.025; //This is a factor mutliplied to calculate the amount of follower loss for red agent
 
     /**
@@ -413,7 +413,7 @@ public class Game {
             // The more certain the green agent is, the higher the energy loss
             if (!byGreyAgent && curAgent.getUncertainty() < 0) {
                 double curUncertainty = -curAgent.getUncertainty(); 
-                double energyLoss =  curUncertainty * ENERGYSCALEFACTOR;
+                double energyLoss =  curUncertainty * ENERGYSCALEFACTOR / greenAgentCount;
                 blueAgent.decrementEnergy(energyLoss);
             }
 
