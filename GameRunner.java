@@ -9,7 +9,7 @@ public class GameRunner {
     private BlueAI blueAI;                  // Blue AI
     private boolean playAsRedAI;            // True if Red AI is playing, false otherwise
     private boolean playAsBlueAI;           // True if Blue AI is playing, false otherwise
-    private final int maxIterations = 40;   // Maximum number of game simulations
+    private final int maxIterations = 100;   // Maximum number of game simulations
     private final String[][] redMessages =  {   {"1 potency", "1 potency"},
                                                 {"2 potency", "2 potency"},
                                                 {"3 potency", "3 potency"},
@@ -49,19 +49,6 @@ public class GameRunner {
         redAI = new RedAI();    //Creates red AI
         blueAI = new BlueAI();  //Creates blue AI
         scanner = new Scanner(System.in);   //Creates the scanner for user
-
-        if (displayEndGraphs) {
-            //init the arraylist and record the numbers currently voting
-            votingForRedList = new ArrayList<>();
-            votingForBlueList = new ArrayList<>();
-            gameInstance.getVotingOpinions(votingForRedList, votingForBlueList);
-        
-            //init the arraylist and record the round 0 uncertainty
-            listOfRedUncertainty = new ArrayList<>();
-            listOfBlueUncertainty = new ArrayList<>();
-            listOfRedUncertainty.add(gameInstance.getAverageUncertainty(false));
-            listOfBlueUncertainty.add(gameInstance.getAverageUncertainty(true));
-        }
     }
 
     /**
@@ -98,6 +85,19 @@ public class GameRunner {
         this.displayGreenGraph = displayGreenGraph;
         this.displayEndGraphs = displayEndGraphs;
         this.displayNetwork = displayNetwork;
+
+        if (displayEndGraphs) {
+            //init the arraylist and record the numbers currently voting
+            votingForRedList = new ArrayList<>();
+            votingForBlueList = new ArrayList<>();
+            gameInstance.getVotingOpinions(votingForRedList, votingForBlueList);
+        
+            //init the arraylist and record the round 0 uncertainty
+            listOfRedUncertainty = new ArrayList<>();
+            listOfBlueUncertainty = new ArrayList<>();
+            listOfRedUncertainty.add(gameInstance.getAverageUncertainty(false));
+            listOfBlueUncertainty.add(gameInstance.getAverageUncertainty(true));
+        }
     }
 
     /**
@@ -611,16 +611,17 @@ public class GameRunner {
 
     public static void main(String[] args) {
         double[] uncertaintyInterval = {-1.0, 0.4};
-        GameRunner curRunner = new GameRunner(40, 0.4, 10, 40.0, uncertaintyInterval, 60.0);
+        GameRunner curRunner = new GameRunner(1000, 0.5, 10, 50.0, uncertaintyInterval, 50.0);
         
         // Ask user if they want silent
-        boolean silentFlag = curRunner.getOption("\nDo you wish to enable the silent flag?\nWhen this is true, nothing will be printed to terminal.\nWhen it is false, statistics will be printed to the terminal after each turn.\nPlease type in y for yes or n for no.");
+        boolean silentFlag = true;
         curRunner.setSilent(silentFlag);
 
         // Ask user for visualisation options
         boolean displayGreenGraph = curRunner.getOption("\nDo you wish to see the green network graph for each round?\nPlease type in y for yes or n for no.");
         boolean displayEndGraphs = curRunner.getOption("\nDo you wish to see the graph of voting opinions and average uncertainty over time at the end of the game?\nPlease type in y for yes or n for no.");
         boolean displayNetwork = curRunner.getOption("\nDo you wish to see the network graphs for green and grey agents?\nPlease type in y for yes or n for no.");
+        curRunner.setDisplays(displayGreenGraph, displayEndGraphs, displayNetwork);
         curRunner.setDisplays(displayGreenGraph, displayEndGraphs, displayNetwork);
         
         // Ask user if red agent is played by user or AI
