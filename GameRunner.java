@@ -625,7 +625,7 @@ public class GameRunner {
 
     public static void main(String[] args) {
         double[] uncertaintyInterval = {-1.0, 1.0};
-        GameRunner curRunner = new GameRunner(100, 0.5, 10, 50.0, uncertaintyInterval, 50.0);
+        GameRunner curRunner = new GameRunner(1000, 0.5, 10, 50.0, uncertaintyInterval, 50.0);
         
         // Ask user if they want silent
         boolean silentFlag = true;
