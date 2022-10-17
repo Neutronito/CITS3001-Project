@@ -153,6 +153,20 @@ public class GameRunner {
         if (displayNetwork) {
             displayNetworks();
         }
+
+        //Ask the user if they wish to see the graph
+        if (displayGreenGraph) {
+            ProcessBuilder processBuilder = new ProcessBuilder("python", "./graphs/greenGrapher.py", gameInstance.getFormattedGreenViews());
+            processBuilder.redirectErrorStream(true);
+            
+            try {
+                Process process = processBuilder.start();
+                process.waitFor();
+            } catch(Exception e) {
+                System.out.println("\nError, unable to launch the python script.");
+                System.out.println(e);
+            }
+        }
         
         Scanner scanner = getScanner();
         //True when game end is triggered, false when game is running
@@ -610,8 +624,8 @@ public class GameRunner {
     }
 
     public static void main(String[] args) {
-        double[] uncertaintyInterval = {-1.0, 0.4};
-        GameRunner curRunner = new GameRunner(1000, 0.5, 10, 50.0, uncertaintyInterval, 50.0);
+        double[] uncertaintyInterval = {-0.2, 0.2};
+        GameRunner curRunner = new GameRunner(100, 0.5, 10, 50.0, uncertaintyInterval, 50.0);
         
         // Ask user if they want silent
         boolean silentFlag = true;
