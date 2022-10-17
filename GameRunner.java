@@ -176,6 +176,8 @@ public class GameRunner {
             numIterations++;
             //store the voting distribution
             int[] beforeTurnDistribution = gameInstance.getVotingOpinions();
+            String redMapHash = gameInstance.redHashBoardState();
+            String blueMapHash = gameInstance.blueHashBoardState();
 
             //Execute the red turn
             int redMove = playRedTurn();
@@ -196,8 +198,7 @@ public class GameRunner {
                 //Execute the red rewards
                 int redGain = distribution[0] - beforeTurnDistribution[0];
                 int reward = (int)((double)(redGain) / (double)(distribution[0] + distribution[1]) * 100.0);
-                String mapHash = gameInstance.redHashBoardState();
-                redAI.updateRewards(reward, mapHash, redMove);
+                redAI.updateRewards(reward, redMapHash, redMove);
             }
 
             if (playAsBlueAI) {
@@ -206,8 +207,7 @@ public class GameRunner {
                 //Execute the red rewards
                 int blueGain = distribution[1] - beforeTurnDistribution[1];
                 int reward = (int)((double)(blueGain) / (double)(distribution[0] + distribution[1]) * 100.0);
-                String mapHash = gameInstance.blueHashBoardState();
-                blueAI.updateRewards(reward, mapHash, bluePotency, blueOption);
+                blueAI.updateRewards(reward, blueMapHash, bluePotency, blueOption);
             }
             
             //Print the metrics now
@@ -624,7 +624,7 @@ public class GameRunner {
     }
 
     public static void main(String[] args) {
-        double[] uncertaintyInterval = {-0.2, 0.2};
+        double[] uncertaintyInterval = {-1.0, 1.0};
         GameRunner curRunner = new GameRunner(100, 0.5, 10, 50.0, uncertaintyInterval, 50.0);
         
         // Ask user if they want silent
