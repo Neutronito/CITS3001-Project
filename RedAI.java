@@ -203,7 +203,7 @@ public class RedAI {
             allMoves.put(mapHash, hashValue);
         } else {
             //There is something already here.
-            //I want to try something, i want the algorithm to trust its previous moves more than the map,
+            //I want the algorithm to trust its previous moves more than the map,
             //so I am going to make it take the smallest value
             if (reward < hashReward) {
                 int hashValue = Math.abs(reward * 10) + previousMove;
