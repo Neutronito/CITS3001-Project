@@ -20,7 +20,7 @@ public class RedAI {
     private HashMap<String, Integer> allMoves;
 
     //Tuning Parameters for the AI
-    private final int EXPLORATIONRATE = 30; //30%, so 0.3 chance of doing a random explore move instead of exploitation
+    private final int EXPLORATIONRATE = 0; //30%, so 0.3 chance of doing a random explore move instead of exploitation
     private final int REWARDDIFFERENCE = 25; //If the difference is above this value, it is considered big enough to choose the better option
     private final int WORSTMOVEMIN = -10; //If we have 2 bad moves, provided one of them is above this value, we will still choose it
 
