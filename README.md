@@ -1,5 +1,10 @@
 # CITS3001-Project
 
+##Overview
+This was the project completed for the UWA unit CITS3001 (Agents, Algorithms and Artificial Intelligence). The purpose of this project was to develop a game and then create an AI to play this game. The game was a blue team vs red team style game, situated in a theoretical political enviromnent, where the blue team and red team can release different messages to a population to affect their opinion. We implemented an AI with reinforcement learning to play as the blue team and red team. 
+
+We were awarded full marks for this project. 
+
 # Green Network Interaction Testing
 
 ## Trial 1
@@ -193,6 +198,3 @@ Average uncertainty went from -0.2748 to -0.9133
 ### Trial 6 - 5
 Changed to 99 voting and 1 not voting
 Average uncertainty went from -0.2844 to -0.7540
-
-### Aside
-Things have now gotten very interesting. This idea seemed to work, but it seems that while an opinion will dominate, it swings either way, regardless of which opinion was initially dominant. For further analysis, I will single models with many intermediate snapshots, say every 100 turns, to see what is going on. Also, I believe the "swing" is based on the newtork arrangement as well, so despite trying to run away from it as much as I could, it appears I will now have to draw up the model and see how it looks. 
